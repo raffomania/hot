@@ -1,5 +1,5 @@
 defmodule Hot.Trakt.Api do
-  def req() do
+  def get_watched() do
     api_key = Application.fetch_env!(:hot, :trakt_api_key)
     username = Application.fetch_env!(:hot, :trakt_username)
     url = "https://api.trakt.tv/users/#{username}/watched/shows"

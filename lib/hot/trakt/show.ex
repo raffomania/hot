@@ -11,6 +11,7 @@ defmodule Hot.Trakt.Show do
 
   actions do
     defaults [:read, create: []]
+    default_accept [:title, :trakt_id]
   end
 
   attributes do
