@@ -11,7 +11,6 @@ defmodule Hot.Application do
       HotWeb.Telemetry,
       Hot.Repo,
       {Ecto.Migrator, repos: Application.fetch_env!(:hot, :ecto_repos), skip: skip_migrations?()},
-      {DNSCluster, query: Application.get_env(:hot, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Hot.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Hot.Finch},
