@@ -20,6 +20,9 @@ if System.get_env("PHX_SERVER") do
   config :hot, HotWeb.Endpoint, server: true
 end
 
+config :hot, trakt_api_key: System.get_env("TRAKT_API_KEY")
+config :hot, trakt_username: System.get_env("TRAKT_USERNAME")
+
 if config_env() == :prod do
   database_path =
     System.get_env("DATABASE_PATH") || "/data/hot.db"

@@ -1,5 +1,10 @@
+set dotenv-load := true
+
 run:
     mix phx.server
+
+iex:
+    iex -S mix
     
 build-container:
     podman build --tag=ghcr.io/raffomania/hot .
