@@ -1,10 +1,14 @@
 set dotenv-load := true
 
-run:
+run: migrate-db
     mix phx.server
 
 iex:
     iex -S mix
+
+migrate-db:
+    mix ash_sqlite.create
+    mix ash_sqlite.migrate
     
 build-container:
     podman build --tag=ghcr.io/raffomania/hot .

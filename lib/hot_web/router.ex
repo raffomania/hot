@@ -18,6 +18,10 @@ defmodule HotWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live "/shows", ShowLive.Index, :index
+    live "/shows/new", ShowLive.Form, :new
+    live "/shows/:id", ShowLive.Show, :show
   end
 
   # Other scopes may use custom stacks.

@@ -47,7 +47,8 @@ config :spark,
 
 config :hot,
   ecto_repos: [Hot.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  ash_domains: [Hot.Trakt]
 
 # Configures the endpoint
 config :hot, HotWeb.Endpoint,
