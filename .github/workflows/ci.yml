@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-lint:
+    name: Build & Publish Container
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: podman login
+        env:
+          USER: ${{ github.actor }}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: podman login --username "$USER" --password "$PASSWORD" ghcr.io
+
+      - run: podman system migrate
+
+      - name: podman build linux/amd64
+        run: podman build --format docker --platform linux/amd64 --manifest hot -f Containerfile .
+
+      - name: podman manifest push latest
+        run: podman manifest push hot ghcr.io/raffomania/hot:latest
+        if: github.ref == 'refs/heads/main'
