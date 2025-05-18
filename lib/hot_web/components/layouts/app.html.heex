@@ -1,12 +1,10 @@
-<header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between py-3 text-sm border-b border-zinc-100">
-    <div class="flex items-center gap-4">
-      <p class="px-2 font-medium leading-6 rounded-full bg-brand/5 text-brand">
-        v{Application.spec(:phoenix, :vsn)}
-      </p>
-    </div>
-  </div>
-</header>
+<.navbar id="root-navbar">
+  <:start_content>
+    <.link navigate={~p"/"}>
+      <h1>🔥 hotties</h1>
+    </.link>
+  </:start_content>
+</.navbar>
 <main class="px-4 py-20 sm:px-6 lg:px-8">
   <div class="max-w-2xl mx-auto">
     <.flash_group flash={@flash} />

@@ -195,7 +195,7 @@ defmodule HotWeb.Components.Alert do
         hidden
       >
         {gettext("Attempting to reconnect")}
-        <.icon name="hero-arrow-path" class="ms-1 h-3 w-3 animate-spin" />
+        <.icon name="hero-arrow-path" class="w-3 h-3 ms-1 animate-spin" />
       </.flash>
 
       <.flash
@@ -209,7 +209,7 @@ defmodule HotWeb.Components.Alert do
         hidden
       >
         {gettext("Hang in there while we get back on track")}
-        <.icon name="hero-arrow-path" class="ms-1 h-3 w-3 animate-spin" />
+        <.icon name="hero-arrow-path" class="w-3 h-3 ms-1 animate-spin" />
       </.flash>
     </div>
     """
