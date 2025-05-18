@@ -7,8 +7,8 @@
       "source": "id",
       "references": null,
       "allow_nil?": false,
-      "generated?": false,
-      "primary_key?": true
+      "primary_key?": true,
+      "generated?": false
     },
     {
       "default": "nil",
@@ -17,31 +17,31 @@
       "source": "title",
       "references": null,
       "allow_nil?": false,
-      "generated?": false,
-      "primary_key?": false
+      "primary_key?": false,
+      "generated?": false
     },
     {
       "default": "nil",
       "size": null,
-      "type": "text",
+      "type": "bigint",
       "source": "trakt_id",
       "references": null,
       "allow_nil?": false,
-      "generated?": false,
-      "primary_key?": false
+      "primary_key?": false,
+      "generated?": false
     }
   ],
   "table": "shows",
-  "hash": "545EBB018B2AE5351236C153DEC594313ADF7DF53B38E27AC3A1F62B07E47987",
+  "hash": "CCD8542E3E26B6FA43FA18C58B8F9B5320E681959708DA3999C0C0E98AB8F448",
   "multitenancy": {
     "global": null,
-    "strategy": null,
-    "attribute": null
+    "attribute": null,
+    "strategy": null
   },
   "identities": [],
   "repo": "Elixir.Hot.Repo",
-  "base_filter": null,
   "custom_indexes": [],
+  "base_filter": null,
   "custom_statements": [],
   "has_create_action": true
 }

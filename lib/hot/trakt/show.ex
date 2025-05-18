@@ -10,7 +10,7 @@ defmodule Hot.Trakt.Show do
   end
 
   actions do
-    defaults [:read, create: []]
+    defaults [:read, :create]
     default_accept [:title, :trakt_id]
   end
 
@@ -21,7 +21,7 @@ defmodule Hot.Trakt.Show do
       allow_nil? false
     end
 
-    attribute :trakt_id, :string do
+    attribute :trakt_id, :integer do
       allow_nil? false
     end
   end

@@ -4,12 +4,13 @@ defmodule Hot.Trakt.Task do
     |> Enum.map(fn entry ->
       show =
         Map.get(entry, "show")
-        |> IO.inspect()
 
-      params = %{
-        title: Map.get(show, "title"),
-        trakt_id: Map.get(show, "ids") |> Map.get("trakt")
-      }
+      params =
+        %{
+          title: Map.get(show, "title"),
+          trakt_id: get_in(show, ["ids", "trakt"])
+        }
+        |> IO.inspect()
 
       Ash.Changeset.for_create(Hot.Trakt.Show, :create, params)
     end)

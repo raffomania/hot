@@ -4,16 +4,14 @@ defmodule HotWeb.ShowLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <.header>
-        Show {@show.id}
-        <:subtitle>This is a show record from your database.</:subtitle>
-      </.header>
+    <.header>
+      Show {@show.id}
+      <:subtitle>This is a show record from your database.</:subtitle>
+    </.header>
 
-      <.list>
-        <:item title="Id">{@show.id}</:item>
-      </.list>
-    </Layouts.app>
+    <.list>
+      <:item title="Id">{@show.id}</:item>
+    </.list>
     """
   end
 

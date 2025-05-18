@@ -4,17 +4,15 @@ defmodule HotWeb.ShowLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <.header>
-        {@page_title}
-        <:subtitle>Use this form to manage show records in your database.</:subtitle>
-      </.header>
+    <.header>
+      {@page_title}
+      <:subtitle>Use this form to manage show records in your database.</:subtitle>
+    </.header>
 
-      <.form for={@form} id="show-form" phx-change="validate" phx-submit="save">
-        <.button phx-disable-with="Saving..." variant="primary">Save Show</.button>
-        <.button navigate={return_path(@return_to, @show)}>Cancel</.button>
-      </.form>
-    </Layouts.app>
+    <.form for={@form} id="show-form" phx-change="validate" phx-submit="save">
+      <.button phx-disable-with="Saving..." variant="primary">Save Show</.button>
+      <.button navigate={return_path(@return_to, @show)}>Cancel</.button>
+    </.form>
     """
   end
 

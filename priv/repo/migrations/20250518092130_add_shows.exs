@@ -9,7 +9,7 @@ defmodule Hot.Repo.Migrations.AddShows do
 
   def up do
     create table(:shows, primary_key: false) do
-      add :trakt_id, :text, null: false
+      add :trakt_id, :bigint, null: false
       add :title, :text, null: false
       add :id, :uuid, null: false, primary_key: true
     end
