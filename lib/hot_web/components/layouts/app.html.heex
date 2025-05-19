@@ -1,13 +1,13 @@
-<.navbar id="root-navbar">
-  <:start_content>
-    <.link navigate={~p"/"}>
-      <h1>🔥 hotties</h1>
-    </.link>
-  </:start_content>
-</.navbar>
-<main class="px-4 py-20 sm:px-6 lg:px-8">
-  <div class="max-w-2xl mx-auto">
-    <.flash_group flash={@flash} />
-    {@inner_content}
-  </div>
-</main>
+<div class="max-w-xl mx-auto">
+  <nav class="p-4 sm:px-6 lg:px-8">
+    <a href={~p"/"}>
+      <h1 class="font-bold">🔥 hotties</h1>
+    </a>
+  </nav>
+  <main class="px-4 py-20 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto">
+      <.flash_group flash={@flash} />
+      {@inner_content}
+    </div>
+  </main>
+</div>

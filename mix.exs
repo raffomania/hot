@@ -34,7 +34,6 @@ defmodule Hot.MixProject do
   defp deps do
     [
       {:sourceror, "~> 1.8", only: [:dev, :test]},
-      {:mishka_chelekom, "~> 0.0", only: [:dev]},
       {:live_debugger, "~> 0.2", only: [:dev]},
       {:ash_admin, "~> 0.13"},
       {:ash_sqlite, "~> 0.2"},

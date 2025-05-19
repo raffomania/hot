@@ -6,11 +6,6 @@ defmodule HotWeb.ShowLive.Index do
     ~H"""
     <.header>
       Listing Shows
-      <:actions>
-        <.button variant="primary" navigate={~p"/shows/new"}>
-          <.icon name="hero-plus" /> New Show
-        </.button>
-      </:actions>
     </.header>
 
     <.table

@@ -88,7 +88,7 @@ defmodule HotWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components
-      use HotWeb.Components.MishkaComponents
+      import HotWeb.CoreComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
