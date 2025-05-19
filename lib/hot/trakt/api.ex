@@ -2,33 +2,38 @@ require Logger
 
 defmodule Hot.Trakt.Api do
   def get_watched() do
-    api_key = Application.fetch_env!(:hot, :trakt_api_key)
     username = Application.fetch_env!(:hot, :trakt_username)
-    url = "https://api.trakt.tv/users/#{username}/watched/shows"
+    path = "/users/#{username}/watched/shows"
 
     {:ok, %Finch.Response{body: body, status: 200}} =
-      Finch.build(:get, url, [
-        {"Content-Type", "application/json"},
-        {
-          "trakt-api-version",
-          "2"
-        },
-        {
-          "trakt-api-key",
-          api_key
-        },
-        {
-          "User-Agent",
-          "Hotties"
-        }
-      ])
-      |> Finch.request(Hot.Finch)
+      req(path)
 
     {:ok, json} =
       body
       |> JSON.decode()
 
     json
+  end
+
+  def req(path) do
+    api_key = Application.fetch_env!(:hot, :trakt_api_key)
+
+    Finch.build(:get, "https://api.trakt.tv" <> path, [
+      {"Content-Type", "application/json"},
+      {
+        "trakt-api-version",
+        "2"
+      },
+      {
+        "trakt-api-key",
+        api_key
+      },
+      {
+        "User-Agent",
+        "Hotties"
+      }
+    ])
+    |> Finch.request(Hot.Finch)
   end
 
   def save_shows(shows) do
