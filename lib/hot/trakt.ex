@@ -4,5 +4,7 @@ defmodule Hot.Trakt do
 
   resources do
     resource Hot.Trakt.Show
+    resource Hot.Trakt.Episode
+    resource Hot.Trakt.Season
   end
 end

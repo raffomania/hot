@@ -38,26 +38,25 @@ defmodule Hot.Trakt.Api do
 
   def save_shows(shows) do
     shows
-    |> Enum.map(fn entry ->
-      show =
-        Map.get(entry, "show")
-
-      params =
-        %{
-          title: Map.get(show, "title"),
-          trakt_id: get_in(show, ["ids", "trakt"])
-        }
-
-      Ash.Changeset.for_create(Hot.Trakt.Show, :create, params)
-    end)
+    |> Enum.map(&create_show_changeset/1)
     |> Enum.each(&Ash.create!(&1))
+  end
+
+  def create_show_changeset(entry) do
+    params =
+      %{
+        title: get_in(entry, ["show", "title"]),
+        trakt_id: get_in(entry, ["show", "ids", "trakt"]),
+        seasons: Map.get(entry, "seasons", [])
+      }
+
+    Ash.Changeset.for_create(Hot.Trakt.Show, :create, params)
   end
 
   def initial_load() do
     shows_exist =
       Hot.Trakt.Show
       |> Ash.exists?()
-      |> IO.inspect()
 
     if not shows_exist do
       Logger.info("No shows exist yet, performing initial load...")

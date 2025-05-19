@@ -10,7 +10,7 @@ migrate-db:
     mix ash_sqlite.create
     mix ash_sqlite.migrate
 
-reset-db:
+reset-db: && migrate-db
     mix ash_sqlite.drop
     
 build-container:
