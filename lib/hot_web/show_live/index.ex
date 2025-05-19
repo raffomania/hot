@@ -4,23 +4,11 @@ defmodule HotWeb.ShowLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>
-      Listing Shows
-    </.header>
-
-    <.table
-      id="shows"
-      rows={@streams.shows}
-      row_click={fn {_id, show} -> JS.navigate(~p"/shows/#{show}") end}
-    >
-      <:col :let={{_id, show}} label="Id">{show.id}</:col>
-
-      <:action :let={{_id, show}}>
-        <div class="sr-only">
-          <.link navigate={~p"/shows/#{show}"}>Show</.link>
-        </div>
-      </:action>
-    </.table>
+    <.link :for={{_id, show} <- @streams.shows} navigate={~p"/shows/#{show.id}"}>
+      <h2 class="mb-4 font-bold">
+        {show.title}
+      </h2>
+    </.link>
     """
   end
 
@@ -34,19 +22,8 @@ defmodule HotWeb.ShowLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New Show")
-  end
-
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Shows")
-    |> assign(:show, nil)
-  end
-
-  @impl true
-  def handle_info({HotWeb.ShowLive.FormComponent, {:saved, show}}, socket) do
-    {:noreply, stream_insert(socket, :shows, show)}
+    |> assign(:page_title, "Shows")
   end
 end

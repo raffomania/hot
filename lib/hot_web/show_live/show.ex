@@ -5,13 +5,8 @@ defmodule HotWeb.ShowLive.Show do
   def render(assigns) do
     ~H"""
     <.header>
-      Show {@show.id}
-      <:subtitle>This is a show record from your database.</:subtitle>
+      {@show.title}
     </.header>
-
-    <.list>
-      <:item title="Id">{@show.id}</:item>
-    </.list>
     """
   end
 
@@ -29,5 +24,4 @@ defmodule HotWeb.ShowLive.Show do
   end
 
   defp page_title(:show), do: "Show Show"
-  defp page_title(:edit), do: "Edit Show"
 end
