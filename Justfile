@@ -9,6 +9,9 @@ iex:
 migrate-db:
     mix ash_sqlite.create
     mix ash_sqlite.migrate
+
+reset-db:
+    mix ash_sqlite.drop
     
 build-container:
     podman build --tag=ghcr.io/raffomania/hot .
