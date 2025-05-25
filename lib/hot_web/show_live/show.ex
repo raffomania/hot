@@ -4,9 +4,6 @@ defmodule HotWeb.ShowLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>
-      {@show.title}
-    </.header>
     """
   end
 
@@ -17,11 +14,11 @@ defmodule HotWeb.ShowLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
+    show = Ash.get!(Hot.Trakt.Show, id)
+
     {:noreply,
      socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:show, Ash.get!(Hot.Trakt.Show, id))}
+     |> assign(:page_title, show.title)
+     |> assign(:show, show)}
   end
-
-  defp page_title(:show), do: "Show Show"
 end
