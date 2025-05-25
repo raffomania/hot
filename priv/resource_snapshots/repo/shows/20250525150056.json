@@ -1,0 +1,64 @@
+{
+  "attributes": [
+    {
+      "default": "nil",
+      "size": null,
+      "type": "uuid",
+      "source": "id",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": true,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "title",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "bigint",
+      "source": "trakt_id",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    }
+  ],
+  "table": "shows",
+  "hash": "2FEFE3168C70405C518D9039C152CAE4819419A4D8ACB1A64619051679C77F4D",
+  "multitenancy": {
+    "global": null,
+    "strategy": null,
+    "attribute": null
+  },
+  "identities": [
+    {
+      "name": "unique_title",
+      "keys": [
+        "title"
+      ],
+      "base_filter": null,
+      "index_name": "shows_unique_title_index"
+    },
+    {
+      "name": "unique_trakt_id",
+      "keys": [
+        "trakt_id"
+      ],
+      "base_filter": null,
+      "index_name": "shows_unique_trakt_id_index"
+    }
+  ],
+  "repo": "Elixir.Hot.Repo",
+  "custom_indexes": [],
+  "base_filter": null,
+  "custom_statements": [],
+  "has_create_action": true
+}

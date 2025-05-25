@@ -14,6 +14,9 @@ defmodule Hot.Trakt.Show do
     default_accept [:title, :trakt_id]
 
     create :create do
+      upsert? true
+      upsert_identity :unique_trakt_id
+
       argument :seasons, {:array, :map} do
         allow_nil? false
       end
@@ -36,5 +39,10 @@ defmodule Hot.Trakt.Show do
 
   relationships do
     has_many :seasons, Hot.Trakt.Season
+  end
+
+  identities do
+    identity :unique_title, [:title]
+    identity :unique_trakt_id, [:trakt_id]
   end
 end
