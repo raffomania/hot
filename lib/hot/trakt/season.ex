@@ -16,7 +16,7 @@ defmodule Hot.Trakt.Season do
     create :create do
       primary? true
       upsert? true
-      upsert_identity :unique_number
+      upsert_identity :unique_show_number
 
       argument :episodes, {:array, :map} do
         allow_nil? false
@@ -43,6 +43,6 @@ defmodule Hot.Trakt.Season do
   end
 
   identities do
-    identity :unique_number, [:number]
+    identity :unique_show_number, [:show_id, :number]
   end
 end
