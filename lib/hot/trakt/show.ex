@@ -11,7 +11,7 @@ defmodule Hot.Trakt.Show do
 
   actions do
     defaults [:read]
-    default_accept [:title, :trakt_id]
+    default_accept [:title, :trakt_id, :imdb_id]
 
     create :create do
       upsert? true
@@ -35,6 +35,8 @@ defmodule Hot.Trakt.Show do
     attribute :trakt_id, :integer do
       allow_nil? false
     end
+
+    attribute :imdb_id, :string
   end
 
   relationships do

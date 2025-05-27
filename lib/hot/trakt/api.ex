@@ -47,6 +47,7 @@ defmodule Hot.Trakt.Api do
       %{
         title: get_in(entry, ["show", "title"]),
         trakt_id: get_in(entry, ["show", "ids", "trakt"]),
+        imdb_id: get_in(entry, ["show", "ids", "imdb"]),
         seasons: Map.get(entry, "seasons", [])
       }
 

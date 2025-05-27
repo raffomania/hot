@@ -4,6 +4,14 @@ defmodule HotWeb.ShowLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
+    <h2 class="font-bold">Links</h2>
+    <a href={"https://trakt.tv/search/trakt/#{@show.trakt_id}?id_type=show"} class="underline">
+      Trakt
+    </a>
+    &nbsp;
+    <a href={"https://imdb.com/title/#{@show.imdb_id}"} class="underline">
+      IMDB
+    </a>
     """
   end
 

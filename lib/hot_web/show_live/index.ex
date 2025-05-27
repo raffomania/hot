@@ -4,13 +4,13 @@ defmodule HotWeb.ShowLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-2 gap-4">
       <%= for {_id, episode} <- @streams.episodes do %>
         <div class="text-right">
           <p>{format_date_relative(episode.last_watched_at)}</p>
           <p class="text-neutral-500">{format_date_absolute(episode.last_watched_at)}</p>
         </div>
-        <div class="col-span-2">
+        <div class="col-span-1">
           <.link navigate={~p"/shows/#{episode.season.show.id}"}>
             <h3 class="underline">
               {episode.season.show.title}
