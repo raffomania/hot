@@ -17,7 +17,8 @@ defmodule Hot.Application do
       # Start a worker by calling: Hot.Worker.start_link(arg)
       # {Hot.Worker, arg},
       # Start to serve requests, typically the last entry
-      HotWeb.Endpoint
+      HotWeb.Endpoint,
+      Hot.Trakt.Updater
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

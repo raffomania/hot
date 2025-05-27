@@ -1,6 +1,11 @@
 defmodule Hot.Trakt do
   use Ash.Domain,
-    otp_app: :hot
+    otp_app: :hot,
+    extensions: [AshAdmin.Domain]
+
+  admin do
+    show? true
+  end
 
   resources do
     resource Hot.Trakt.Show

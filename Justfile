@@ -24,3 +24,8 @@ run-container: build-container
 
 generate-migration name:
     mix ash.codegen --name {{name}}
+
+clean:
+    mix clean
+    rm -rf .elixir_ls
+    rm -rf _build
