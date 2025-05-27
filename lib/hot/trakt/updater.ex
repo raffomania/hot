@@ -21,7 +21,7 @@ defmodule Hot.Trakt.Updater do
   end
 
   defp update() do
-    Hot.Trakt.Api.initial_load()
+    Hot.Trakt.Api.update_db()
   end
 
   def schedule_next_update() do

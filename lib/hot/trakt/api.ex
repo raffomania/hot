@@ -53,16 +53,8 @@ defmodule Hot.Trakt.Api do
     Ash.Changeset.for_create(Hot.Trakt.Show, :create, params)
   end
 
-  def initial_load() do
-    shows_exist =
-      Hot.Trakt.Show
-      |> Ash.exists?()
-
-    if not shows_exist do
-      Logger.info("No shows exist yet, performing initial load...")
-
-      get_watched()
-      |> save_shows()
-    end
+  def update_db() do
+    get_watched()
+    |> save_shows()
   end
 end
