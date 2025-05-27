@@ -36,17 +36,12 @@ defmodule HotWeb.ShowLive.Index do
       |> Ash.Query.limit(5)
       |> Ash.read!()
 
-    {:ok, stream(socket, :episodes, episodes)}
-  end
+    socket =
+      socket
+      |> stream(:episodes, episodes)
+      |> assign(:page_title, "Watched Log")
 
-  @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  defp apply_action(socket, :index, _params) do
-    socket
-    |> assign(:page_title, "Recently Watched")
+    {:ok, socket}
   end
 
   def format_date_relative(now \\ DateTime.utc_now(), later) do
