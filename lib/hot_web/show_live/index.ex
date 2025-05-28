@@ -1,9 +1,11 @@
 defmodule HotWeb.ShowLive.Index do
   use HotWeb, :live_view
+  require Ash.Expr
 
   @impl true
   def render(assigns) do
     ~H"""
+    <h2 class="mb-8 font-bold text-center">Watch Log</h2>
     <div class="grid grid-cols-2 gap-4">
       <%= for {_id, episode} <- @streams.episodes do %>
         <div class="text-right">
@@ -11,10 +13,8 @@ defmodule HotWeb.ShowLive.Index do
           <p class="text-neutral-500">{format_date_absolute(episode.last_watched_at)}</p>
         </div>
         <div class="col-span-1">
-          <.link navigate={~p"/shows/#{episode.season.show.id}"}>
-            <h3 class="underline">
-              {episode.season.show.title}
-            </h3>
+          <.link navigate={~p"/shows/#{episode.season.show.id}"} class="underline">
+            {episode.season.show.title}
           </.link>
           <p>
             S{format_season_episode_number(episode.season.number)}E{format_season_episode_number(
@@ -23,6 +23,20 @@ defmodule HotWeb.ShowLive.Index do
           </p>
         </div>
       <% end %>
+    </div>
+    <h2 class="mt-16 mb-8 font-bold text-center">All shows</h2>
+    <div class="grid grid-cols-2 gap-8">
+      <div
+        :for={year <- Map.keys(@other_shows) |> Enum.sort() |> Enum.reverse()}
+        class="grid grid-cols-2 gap-2"
+      >
+        <p class="text-right">{year}</p>
+        <div class="flex flex-col">
+          <.link :for={show <- @other_shows[year]} navigate={~p"/shows/#{show.id}"} class="underline">
+            {show.title}
+          </.link>
+        </div>
+      </div>
     </div>
     """
   end
@@ -36,10 +50,16 @@ defmodule HotWeb.ShowLive.Index do
       |> Ash.Query.limit(5)
       |> Ash.read!()
 
+    other_shows =
+      Hot.Trakt.Show
+      |> Ash.ActionInput.for_action(:recent_shows_by_year, %{})
+      |> Ash.run_action!()
+
     socket =
       socket
       |> stream(:episodes, episodes)
-      |> assign(:page_title, "Watched Log")
+      |> assign(:other_shows, other_shows)
+      |> assign(:page_title, "Home")
 
     {:ok, socket}
   end

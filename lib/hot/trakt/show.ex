@@ -42,6 +42,27 @@ defmodule Hot.Trakt.Show do
         {:ok, count}
       end
     end
+
+    action :recent_shows_by_year, :map do
+      run fn _, _ ->
+        year_fragment =
+          shows =
+          from(sh in Hot.Trakt.Show,
+            left_join: se in assoc(sh, :seasons),
+            left_join: ep in assoc(se, :episodes),
+            select: %{
+              year: fragment("strftime('%Y', ?)", ep.last_watched_at),
+              title: sh.title,
+              id: sh.id
+            },
+            group_by: [sh.id, fragment("strftime('%Y', ?)", ep.last_watched_at)]
+          )
+          |> Hot.Repo.all()
+          |> Enum.group_by(& &1.year, &Function.identity/1)
+
+        {:ok, shows}
+      end
+    end
   end
 
   attributes do
