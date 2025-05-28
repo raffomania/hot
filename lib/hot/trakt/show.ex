@@ -4,6 +4,8 @@ defmodule Hot.Trakt.Show do
     domain: Hot.Trakt,
     data_layer: AshSqlite.DataLayer
 
+  import Ecto.Query
+
   sqlite do
     table "shows"
     repo Hot.Repo
@@ -22,6 +24,23 @@ defmodule Hot.Trakt.Show do
       end
 
       change manage_relationship(:seasons, type: :create)
+    end
+
+    action :count_episodes, :integer do
+      argument :id, :uuid_v7, allow_nil?: false
+
+      run fn input, _ ->
+        count =
+          from(sh in Hot.Trakt.Show,
+            left_join: se in assoc(sh, :seasons),
+            left_join: ep in assoc(se, :episodes),
+            where: sh.id == ^input.arguments.id and not is_nil(ep.last_watched_at),
+            select: count(ep.id)
+          )
+          |> Hot.Repo.one!()
+
+        {:ok, count}
+      end
     end
   end
 
