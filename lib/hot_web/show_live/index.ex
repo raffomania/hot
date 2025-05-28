@@ -71,8 +71,8 @@ defmodule HotWeb.ShowLive.Index do
       days_diff <= 0 -> "in the future???"
       days_diff <= 1 -> "today"
       days_diff <= 7 -> "#{days_diff} days ago"
-      days_diff <= 14 -> "1 week ago"
-      true -> "#{div(days_diff, 7)} weeks ago"
+      days_diff <= 11 -> "1 week ago"
+      true -> "#{round(days_diff / 7)} weeks ago"
     end
   end
 
