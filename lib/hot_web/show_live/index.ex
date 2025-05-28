@@ -24,13 +24,12 @@ defmodule HotWeb.ShowLive.Index do
         </div>
       <% end %>
     </div>
-    <h2 class="mt-16 mb-8 font-bold text-center">All shows</h2>
-    <div class="grid grid-cols-2 gap-8">
+    <div class="grid max-w-4xl grid-cols-1 gap-8 mx-auto mt-16 sm:grid-cols-2 md:grid-cols-3">
       <div
         :for={year <- Map.keys(@other_shows) |> Enum.sort() |> Enum.reverse()}
-        class="grid grid-cols-2 gap-2"
+        class="grid grid-cols-[3rem_1fr] gap-4"
       >
-        <p class="text-right">{year}</p>
+        <p class="font-bold text-right">{year}</p>
         <div class="flex flex-col">
           <.link :for={show <- @other_shows[year]} navigate={~p"/shows/#{show.id}"} class="underline">
             {show.title}
