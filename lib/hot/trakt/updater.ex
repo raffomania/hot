@@ -27,6 +27,6 @@ defmodule Hot.Trakt.Updater do
   def schedule_next_update() do
     hours = 8
     interval_ms = 1000 * 60 * 60 * hours
-    Process.send_after(self(), :scrape, interval_ms)
+    Process.send_after(self(), :update, interval_ms)
   end
 end
