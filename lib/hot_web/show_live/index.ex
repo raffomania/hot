@@ -4,6 +4,8 @@ defmodule HotWeb.ShowLive.Index do
 
   @impl true
   def render(assigns) do
+    IO.inspect(DateTime.utc_now())
+
     ~H"""
     <h2 class="mb-8 font-bold text-center">Watch Log</h2>
     <div class="grid grid-cols-2 gap-4">
@@ -75,11 +77,16 @@ defmodule HotWeb.ShowLive.Index do
   end
 
   def format_date_relative(now \\ DateTime.utc_now(), later) do
-    days_diff = DateTime.diff(now, later, :day)
+    now_date = DateTime.to_date() |> DateTime.f()
+    later_date = DateTime.to_date(later)
+    days_diff = DateTime.diff(now_date, later_date, :day)
+
+    IO.inspect(later)
 
     cond do
-      days_diff <= 0 -> "in the future???"
-      days_diff <= 1 -> "today"
+      days_diff < 0 -> "in the future???"
+      days_diff == 0 -> "today"
+      days_diff == 1 -> "1 day ago"
       days_diff <= 7 -> "#{days_diff} days ago"
       days_diff <= 11 -> "1 week ago"
       true -> "#{round(days_diff / 7)} weeks ago"
