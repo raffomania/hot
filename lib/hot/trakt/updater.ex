@@ -7,7 +7,6 @@ defmodule Hot.Trakt.Updater do
 
   @impl true
   def init(state) do
-    update()
     schedule_next_update()
     {:ok, state}
   end

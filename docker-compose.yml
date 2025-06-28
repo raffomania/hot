@@ -1,0 +1,16 @@
+services:
+  hot:
+    build:
+      context: .
+      dockerfile: Containerfile.dev
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "4000:4000"
+    environment:
+      - MIX_ENV=dev
+      - DATABASE_URL=ecto://db.sqlite3
+      - LISTEN_PUBLIC=true
+    stdin_open: true
+    tty: true

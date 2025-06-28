@@ -1,0 +1,22 @@
+FROM elixir:1.18
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y inotify-tools && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install just
+RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+
+# Install Hex and Rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+# Set working directory
+WORKDIR /app
+
+# Set default environment
+ENV MIX_ENV=dev
+
+# Default command
+CMD ["just", "run"]
