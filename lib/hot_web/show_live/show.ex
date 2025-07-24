@@ -41,6 +41,7 @@ defmodule HotWeb.ShowLive.Show do
      socket
      |> assign(:page_title, show.title)
      |> assign(:show, show)
-     |> assign(:seasons, seasons)}
+     |> assign(:seasons, seasons)
+     |> assign(:current_page, :shows)}
   end
 end

@@ -20,8 +20,9 @@ defmodule HotWeb.Router do
     get "/", PageController, :home
 
     live "/shows", ShowLive.Index, :index
-    live "/shows/new", ShowLive.Form, :new
     live "/shows/:id", ShowLive.Show, :show
+
+    live "/board", BoardLive.Index, :index
   end
 
   # Other scopes may use custom stacks.

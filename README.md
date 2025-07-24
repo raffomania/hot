@@ -11,6 +11,10 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
+## Developing with the docker container
+
+Use `docker compose up` to start a local development container with all the dependencies pre-installed. In that container you can also run claude code with `docker compose exec hot claude`.
+
 ## Learn more
 
   * Official website: https://www.phoenixframework.org/

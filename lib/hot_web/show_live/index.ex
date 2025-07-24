@@ -59,6 +59,7 @@ defmodule HotWeb.ShowLive.Index do
       |> stream(:episodes, episodes)
       |> assign(:other_shows, other_shows)
       |> assign(:page_title, "Home")
+      |> assign(:current_page, :shows)
 
     {:ok, socket}
   end
