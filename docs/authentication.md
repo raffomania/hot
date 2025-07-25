@@ -13,6 +13,7 @@ The approach: Custom Session-Based Authentication Plug.
 - **Environment Configuration**: Password set via environment variable
 - **Simple Implementation**: Minimal code complexity
 - **No User Management**: No individual user accounts or registration
+- **No Database Models**: No user tables, schemas, or database-backed authentication
 
 ## Implementation Plan
 
@@ -79,28 +80,69 @@ end
 
 **Deliverable**: All existing routes require authentication but login page is empty (no way to authenticate yet). The test from Milestone 1 should now pass.
 
-### Milestone 3: Full Authentication Implementation + Tests
+### Milestone 3: Authentication Logic Implementation + Tests
 
-**Goal**: Complete the authentication system with password validation and comprehensive tests.
+#### Goal
+Implement the core authentication functionality with password validation and comprehensive tests.
 
-**Components**:
-1. **Complete Authentication Module**
-   - Add session checking logic to both plug and on_mount
-   - Handle authenticated users properly
-   - Password validation function
+#### Important
+This implementation uses only session-based authentication with environment variables. No user database models, tables, or schemas should be created.
 
-2. **Full Auth LiveView**
-   - Login form display with password input
-   - Password validation against `SHARED_PASSWORD` env var
-   - Session management and logout handling
-   - Error display with flash messages
-   - Form submission and event handling
+#### Components
 
-3. **Additional Tests**
-   - Plug unit tests (authenticated/unauthenticated scenarios)
-   - LiveView tests (login success/failure, form validation)
-   - Environment variable configuration tests
-   - Extend existing integration test to cover successful authentication
+##### Complete Authentication Module (`lib/hot_web/shared_auth.ex`)
+- Add session checking logic to both plug and on_mount
+- Handle authenticated users properly
+- Password validation function against `SHARED_PASSWORD` env var
+- Session management (authentication/logout) using Phoenix sessions only
+
+##### Integration Tests (extend `test/hot_web/authentication_test.exs`)
+- Test authenticated user access (session contains auth flag)
+- Test unauthenticated user redirect
+- Test password validation function with correct/incorrect passwords
+- Test on_mount callback behavior for LiveView sessions
+- Test successful authentication flow end-to-end
+- Test session persistence across requests
+- Test logout functionality
+
+#### Test Specifications
+- Password validation tests should assert correct password returns `:ok`, incorrect returns `:error`
+- Session tests should assert authenticated session allows access, missing session redirects
+- Integration tests should assert complete login flow works from protected route → login → back to protected route
+
+#### Deliverable
+Core authentication logic is functional with comprehensive test coverage, but no login UI yet.
+
+### Milestone 4: Login Page Implementation + Tests
+
+#### Goal
+Create the login form interface and complete the authentication system.
+
+#### Components
+
+##### Full Auth LiveView (`lib/hot_web/auth_live/login.ex`)
+- Login form display with password input
+- Form submission and event handling
+- Error display with flash messages
+- Success redirect to original requested page
+- Logout functionality
+
+##### LiveView Tests (`test/hot_web/auth_live/login_test.exs`)
+- Test login form renders correctly
+- Test successful login with correct password
+- Test failed login with incorrect password shows error
+- Test form validation and error messages
+- Test redirect behavior after successful authentication
+- Test logout functionality
+
+#### Test Specifications
+- Form rendering tests should assert password input field and submit button are present
+- Success flow tests should assert correct password submission sets session and redirects
+- Error flow tests should assert incorrect password shows error message and doesn't set session
+- Logout tests should assert session is cleared and user is redirected appropriately
+
+#### Deliverable
+Complete authentication system with functional login page and full test coverage.
 
 **Environment Configuration**:
 ```bash
@@ -143,13 +185,3 @@ lib/hot_web/
 │   └── login.ex                 # Login LiveView module
 └── router.ex                    # Updated with auth routes
 ```
-
-## Success Criteria
-
-- [ ] Single shared password authenticates all users
-- [ ] Password configured via environment variable
-- [ ] Clean login form matching app design
-- [ ] Session persists across page navigation
-- [ ] Automatic redirect after login
-- [ ] password only stored in memory
-- [ ] Works seamlessly with existing LiveView pages
