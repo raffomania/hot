@@ -80,3 +80,7 @@ The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain c
 - Environment-specific configs in `config/` directory
 - Trakt API credentials via application config
 - Auto-migration handling in production releases
+
+## Documentation
+
+- **docs/authentication.md** - Authentication specification and implementation guide
