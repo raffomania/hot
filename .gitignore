@@ -42,3 +42,5 @@ npm-debug.log
 container-data/
 
 .env
+
+.claude/settings.local.json
