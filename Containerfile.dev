@@ -17,8 +17,5 @@ RUN mix local.hex --force && \
 # Set working directory
 WORKDIR /app
 
-# Set default environment
-ENV MIX_ENV=dev
-
 # Default command
 CMD ["just", "run"]
