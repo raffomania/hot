@@ -42,12 +42,9 @@ The implementation is split into three milestones for test-driven incremental de
    - Redirects all unauthenticated requests to `/auth/login`
    - Stores return path for post-login redirect
 
-2. **Basic Auth Controller** (`lib/hot_web/controllers/auth_controller.ex`)
-   - Minimal controller with login action
-   - Renders empty login page
-
-3. **Empty Login Template** (`lib/hot_web/controllers/auth_html/login.html.heex`)
-   - Completely empty page (placeholder)
+2. **Basic Auth LiveView** (`lib/hot_web/auth_live/login.ex`)
+   - Minimal LiveView module for login page
+   - Renders empty login page (placeholder)
 
 4. **Router Configuration**
    - Add protected pipeline with authentication plug
@@ -65,9 +62,7 @@ end
 # Auth routes (public)
 scope "/auth", HotWeb do
   pipe_through :browser
-  get "/login", AuthController, :login
-  post "/login", AuthController, :authenticate
-  get "/logout", AuthController, :logout
+  live "/login", AuthLive.Login, :login
 end
 
 # Protected routes
@@ -94,20 +89,16 @@ end
    - Handle authenticated users properly
    - Password validation function
 
-2. **Full Auth Controller**
-   - Login form display
+2. **Full Auth LiveView**
+   - Login form display with password input
    - Password validation against `SHARED_PASSWORD` env var
-   - Session management and logout
-   - Error handling and flash messages
+   - Session management and logout handling
+   - Error display with flash messages
+   - Form submission and event handling
 
-3. **Complete Login Template**
-   - Password form using HotWeb components
-   - Error display and styling
-   - Integration with TailwindCSS
-
-4. **Additional Tests**
+3. **Additional Tests**
    - Plug unit tests (authenticated/unauthenticated scenarios)
-   - Controller tests (login success/failure, logout)
+   - LiveView tests (login success/failure, form validation)
    - Environment variable configuration tests
    - Extend existing integration test to cover successful authentication
 
@@ -148,10 +139,8 @@ SHARED_PASSWORD=dev_password_123
 ```
 lib/hot_web/
 ├── shared_auth.ex               # Authentication module (plug + on_mount)
-├── controllers/
-│   ├── auth_controller.ex       # Login/logout controller
-│   └── auth_html/
-│       └── login.html.heex      # Login form template
+├── auth_live/
+│   └── login.ex                 # Login LiveView module
 └── router.ex                    # Updated with auth routes
 ```
 

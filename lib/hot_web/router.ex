@@ -14,15 +14,32 @@ defmodule HotWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :protected do
+    plug :browser
+    plug HotWeb.SharedAuth
+  end
+
+  # Auth routes (public)
+  scope "/auth", HotWeb do
+    pipe_through :browser
+    live "/login", AuthLive.Login, :login
+  end
+
+  # Public routes
   scope "/", HotWeb do
     pipe_through :browser
-
     get "/", PageController, :home
-
     live "/shows", ShowLive.Index, :index
     live "/shows/:id", ShowLive.Show, :show
+  end
 
-    live "/board", BoardLive.Index, :index
+  # Protected routes
+  scope "/", HotWeb do
+    pipe_through :protected
+
+    live_session :protected, on_mount: HotWeb.SharedAuth do
+      live "/board", BoardLive.Index, :index
+    end
   end
 
   # Other scopes may use custom stacks.
