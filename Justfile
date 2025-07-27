@@ -36,6 +36,13 @@ run-container: build-container
 generate-migration name:
     mix ash.codegen --name {{name}}
 
+# find outdated dependencies
+outdated:
+    mix hex.outdated
+
+update-dependencies:
+    mix hex.update
+
 # Remove all build artifacts
 clean:
     mix clean
