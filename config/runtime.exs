@@ -22,6 +22,7 @@ end
 
 config :hot, trakt_api_key: System.get_env("TRAKT_API_KEY")
 config :hot, trakt_username: System.get_env("TRAKT_USERNAME")
+config :hot, shared_password: System.get_env("SHARED_PASSWORD")
 
 if config_env() == :prod do
   database_path =

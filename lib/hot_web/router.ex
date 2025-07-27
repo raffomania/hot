@@ -22,7 +22,9 @@ defmodule HotWeb.Router do
   # Auth routes (public)
   scope "/auth", HotWeb do
     pipe_through :browser
-    live "/login", AuthLive.Login, :login
+    get "/login", AuthController, :login
+    post "/login", AuthController, :authenticate
+    delete "/logout", AuthController, :logout
   end
 
   # Public routes

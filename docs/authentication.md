@@ -63,7 +63,9 @@ end
 # Auth routes (public)
 scope "/auth", HotWeb do
   pipe_through :browser
-  live "/login", AuthLive.Login, :login
+  get "/login", AuthController, :login
+  post "/login", AuthController, :authenticate
+  delete "/logout", AuthController, :logout
 end
 
 # Protected routes
@@ -116,19 +118,26 @@ Core authentication logic is functional with comprehensive test coverage, but no
 ### Milestone 4: Login Page Implementation + Tests
 
 #### Goal
-Create the login form interface and complete the authentication system.
+Create the login form interface and complete the authentication system using a standard Phoenix controller approach.
 
 #### Components
 
-##### Full Auth LiveView (`lib/hot_web/auth_live/login.ex`)
-- Login form display with password input
-- Form submission and event handling
+##### Auth Controller (`lib/hot_web/controllers/auth_controller.ex`)
+- Login page rendering with password form
+- Form submission handling and password validation
 - Error display with flash messages
 - Success redirect to original requested page
+- Session management (create/delete)
 - Logout functionality
 
-##### LiveView Tests (`test/hot_web/auth_live/login_test.exs`)
-- Test login form renders correctly
+##### Login Template (`lib/hot_web/controllers/auth_html/login.html.heex`)
+- Login form display with password input
+- Form submission to auth controller
+- Error message display
+- Clean, responsive UI
+
+##### Controller Tests (`test/hot_web/controllers/auth_controller_test.exs`)
+- Test login page renders correctly
 - Test successful login with correct password
 - Test failed login with incorrect password shows error
 - Test form validation and error messages
@@ -181,7 +190,11 @@ SHARED_PASSWORD=dev_password_123
 ```
 lib/hot_web/
 ├── shared_auth.ex               # Authentication module (plug + on_mount)
-├── auth_live/
-│   └── login.ex                 # Login LiveView module
+├── controllers/
+│   ├── auth_controller.ex       # Auth controller (login/logout)
+│   └── auth_html.ex             # Auth HTML module
+├── controllers/auth_html/
+│   └── login.html.heex          # Login form template
 └── router.ex                    # Updated with auth routes
 ```
+
