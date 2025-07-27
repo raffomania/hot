@@ -16,6 +16,7 @@ Hot is a home-cooked, small app for interacting with tv show tracking data.
 - `just generate-migration <name>` - Generate new Ash migration with codegen
 
 ### Testing and Building
+- `just test` - Run test suite (uses environment variables from .env)
 - `mix test` - Run test suite (includes ash.setup)
 - `mix ash.setup --quiet` - Setup Ash resources for testing
 - `just build-container` - Build container image with Podman

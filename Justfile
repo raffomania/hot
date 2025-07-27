@@ -8,6 +8,10 @@ run: install-dependencies migrate-db
 iex: install-dependencies
     iex -S mix
 
+# Run the test suite (uses environment variables from .env)
+test: install-dependencies
+    mix test
+
 install-dependencies:
     mix deps.get
 
