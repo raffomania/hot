@@ -60,7 +60,6 @@ The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain c
 
 ### External Integrations
 - **Trakt API Client** (`Hot.Trakt.Api`) fetches user watch data
-- **Background Updater** (`Hot.Trakt.Updater`) syncs data every 8 hours
 - **Admin Interface** via AshAdmin for data management
 
 ### Database Schema
@@ -68,13 +67,6 @@ The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain c
 - Seasons belong to shows with episode relationships
 - Episodes track `last_watched_at` for user activity
 - Uses Ash upsert patterns for data synchronization
-
-### Key Patterns
-- Ash resources use declarative actions, relationships, and identities
-- LiveView streams for efficient list rendering
-- GenServer for background job scheduling
-- Phoenix.PubSub for real-time updates
-- Ecto queries with Ash.Query for complex data access
 
 ### Configuration
 - Environment-specific configs in `config/` directory
@@ -84,3 +76,4 @@ The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain c
 ## Documentation
 
 - **docs/authentication.md** - Authentication specification and implementation guide
+- **docs/design.md** - Design guide for minimalistic UI approach
