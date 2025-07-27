@@ -21,21 +21,11 @@ Hot is a home-cooked, small app for interacting with tv show tracking data.
 - `just build-container` - Build container image with Podman
 - `just run-container` - Build and run containerized version
 
-### Asset Management
-- `mix assets.setup` - Install Tailwind and esbuild if missing
-- `mix assets.build` - Build assets for development
-- `mix assets.deploy` - Build and minify assets for production
-
 ### Development Environment
 - Running in a docker container
 
 ## Architecture Overview
-
-### Core Framework Stack
-- **Phoenix 1.7+** with LiveView for real-time UI
-- **Ash Framework** for resource management, APIs, and data modeling
-- **SQLite** with AshSqlite data layer and Ecto ORM
-- **TailwindCSS** for styling with Heroicons integration
+Core Framework Stack is Ash, Phoenix, SQLite with AshSqlite data layer. Styling is done using Tailwind.
 
 ### Domain Structure
 The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain containing:
@@ -43,24 +33,8 @@ The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain c
 - `Hot.Trakt.Season` - Season resource linked to shows
 - `Hot.Trakt.Episode` - Episode resource with watch tracking
 
-### Key Application Components
-- **Application Supervisor** (`Hot.Application`) manages:
-  - Phoenix endpoint and PubSub
-  - Database repo and auto-migrations
-  - Background Trakt updater GenServer
-  - Finch HTTP client for external API calls
-
-### Web Layer
-- **Router** (`HotWeb.Router`) defines:
-  - Main show browsing routes with LiveView
-  - Admin interface at `/admin` (development only)
-  - LiveDashboard at `/dev/dashboard` (development only)
-- **LiveView Components** in `HotWeb.ShowLive.*` for interactive UI
-- **Core Components** provide reusable UI elements
-
 ### External Integrations
-- **Trakt API Client** (`Hot.Trakt.Api`) fetches user watch data
-- **Admin Interface** via AshAdmin for data management
+- Trakt API Client (`Hot.Trakt.Api`) fetches user watch data
 
 ### Database Schema
 - Shows have `trakt_id`, `imdb_id`, and `title` with unique constraints
@@ -69,11 +43,9 @@ The application uses Ash Domain pattern with `Hot.Trakt` as the primary domain c
 - Uses Ash upsert patterns for data synchronization
 
 ### Configuration
-- Environment-specific configs in `config/` directory
 - Trakt API credentials via application config
-- Auto-migration handling in production releases
 
 ## Documentation
 
-- **docs/authentication.md** - Authentication specification and implementation guide
-- **docs/design.md** - Design guide for minimalistic UI approach
+- docs/authentication.md - Authentication specification and implementation guide
+- docs/design.md - Design guide for minimalistic UI approach
