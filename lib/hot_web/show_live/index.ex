@@ -37,11 +37,18 @@ defmodule HotWeb.ShowLive.Index do
         </div>
       </div>
     </div>
+    <div :if={@authenticated} class="pt-12 mt-12 text-center border-t border-neutral-300">
+      <.form for={%{}} action={~p"/auth/logout"} method="delete">
+        <.button type="submit">
+          logout
+        </.button>
+      </.form>
+    </div>
     """
   end
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     episodes =
       Hot.Trakt.Episode
       |> Ash.Query.load(season: [:show])
@@ -54,12 +61,15 @@ defmodule HotWeb.ShowLive.Index do
       |> Ash.ActionInput.for_action(:recent_shows_by_year, %{})
       |> Ash.run_action!()
 
+    authenticated = Map.get(session, "authenticated") == true
+
     socket =
       socket
       |> stream(:episodes, episodes)
       |> assign(:other_shows, other_shows)
       |> assign(:page_title, "Home")
       |> assign(:current_page, :shows)
+      |> assign(:authenticated, authenticated)
 
     {:ok, socket}
   end
