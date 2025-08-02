@@ -13,6 +13,7 @@ test: install-dependencies
     mix test
 
 install-dependencies:
+    mix local.hex --if-missing
     mix deps.get
 
 # Create the database if it doesn't exist, then run all migrations that are not yet applied
