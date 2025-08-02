@@ -4,10 +4,11 @@ Hot is a home-cooked, small app for interacting with tv show tracking data.
 
 ## Development Commands
 
+ALWAYS use `just` tasks to interact with the project (e.g. running tests, formatting, running the server) - if a needed just task doesn't exist, add a todo to `docs/todo.md`.
+
 ### Setup and Running
 - `just run` - Install dependencies, migrate database, and start Phoenix server
 - `just iex` - Start interactive Elixir shell with application loaded
-- `mix phx.server` - Start Phoenix server directly
 - `just install-dependencies` - Install Elixir dependencies via mix
 
 ### Database Operations
@@ -17,8 +18,6 @@ Hot is a home-cooked, small app for interacting with tv show tracking data.
 
 ### Testing and Building
 - `just test` - Run test suite (uses environment variables from .env)
-- `mix test` - Run test suite (includes ash.setup)
-- `mix ash.setup --quiet` - Setup Ash resources for testing
 - `just build-container` - Build container image with Podman
 - `just run-container` - Build and run containerized version
 
