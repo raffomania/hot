@@ -3,3 +3,14 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+/* .sortable-drag {
+} */
+
+.sortable-ghost > * {
+  opacity: 0;
+}
+
+.sortable-ghost {
+  background-color: #f0f0f0;
+}

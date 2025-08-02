@@ -4,21 +4,24 @@ defmodule HotWeb.ShowLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="grid max-w-2xl grid-cols-2 mx-auto gap-y-4 gap-x-2 sm:grid-cols-4">
-      <h2 class="inline mr-4 font-bold sm:text-right">Links</h2>
-      <p>
-        <a href={"https://trakt.tv/search/trakt/#{@show.trakt_id}?id_type=show"} class="underline">
-          Trakt
-        </a>
-        •
-        <a href={"https://imdb.com/title/#{@show.imdb_id}"} class="underline">
-          IMDB
-        </a>
-      </p>
-      <h2 class="inline mr-4 font-bold sm:text-right">Episodes watched</h2>
-      <p>
-        {@seasons}
-      </p>
+    <div class="max-w-2xl px-4 mx-auto my-8">
+      <h1 class="my-8 text-lg font-bold text-center">{@show.title}</h1>
+      <div class="grid grid-cols-2 gap-y-4 gap-x-2 sm:grid-cols-4">
+        <h2 class="inline mr-4 font-bold sm:text-right">Links</h2>
+        <p>
+          <a href={"https://trakt.tv/search/trakt/#{@show.trakt_id}?id_type=show"} class="underline">
+            Trakt
+          </a>
+          •
+          <a href={"https://imdb.com/title/#{@show.imdb_id}"} class="underline">
+            IMDB
+          </a>
+        </p>
+        <h2 class="inline mr-4 font-bold sm:text-right">Total episodes watched</h2>
+        <p>
+          {@seasons}
+        </p>
+      </div>
     </div>
     """
   end

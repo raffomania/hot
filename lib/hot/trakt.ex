@@ -11,5 +11,6 @@ defmodule Hot.Trakt do
     resource Hot.Trakt.Show
     resource Hot.Trakt.Episode
     resource Hot.Trakt.Season
+    resource Hot.Trakt.Card
   end
 end

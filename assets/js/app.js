@@ -19,6 +19,90 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
+import Sortable from "../vendor/sortable.js";
+
+let Hooks = {};
+
+Hooks.BoardList = {
+    mounted() {
+        // Initialize SortableJS for cards (vertical sorting within lists)
+        this.cardSortable = new Sortable(
+            this.el.querySelector(".cards-container"),
+            {
+                group: "cards",
+                animation: 150,
+                onMove: (evt) => {
+                    const targetContainer = evt.to;
+
+                    return true; // Allow the move
+                },
+                onEnd: (evt) => {
+                    this.pushEvent("move_card", {
+                        card_id: evt.item.dataset.cardId,
+                        from_list_id:
+                            evt.from.closest("[data-list-id]").dataset.listId,
+                        to_list_id:
+                            evt.to.closest("[data-list-id]").dataset.listId,
+                        new_position: evt.newIndex,
+                    });
+                },
+            }
+        );
+    },
+    destroyed() {
+        if (this.cardSortable) this.cardSortable.destroy();
+    },
+};
+
+Hooks.FocusInput = {
+    mounted() {
+        this.el.focus();
+    },
+};
+
+Hooks.FocusAndSelect = {
+    mounted() {
+        this.el.focus();
+        this.el.select();
+    },
+};
+
+Hooks.TextareaAutoSave = {
+    mounted() {
+        this.el.focus();
+        this.el.select();
+
+        // Handle Ctrl+Enter to submit
+        this.el.addEventListener("keydown", (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                this.saveValue();
+            }
+        });
+
+        // Handle blur to save
+        this.el.addEventListener("blur", (e) => {
+            this.saveValue();
+        });
+    },
+
+    saveValue() {
+        const cardId = this.el
+            .closest("form")
+            .querySelector('input[name="card_id"]').value;
+        const field = this.el
+            .closest("form")
+            .querySelector('input[name="field"]').value;
+        const value = this.el.value;
+
+        this.pushEvent("save_card_field", {
+            card_id: cardId,
+            field: field,
+            value: value,
+        });
+    },
+};
+
 let csrfToken = document
     .querySelector("meta[name='csrf-token']")
     .getAttribute("content");
@@ -27,7 +111,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
     params: {
         _csrf_token: csrfToken,
     },
-    hooks: {},
+    hooks: Hooks,
 });
 // Show progress bar on live navigation and form submits
 topbar.config({
