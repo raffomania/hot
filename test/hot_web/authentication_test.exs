@@ -33,16 +33,14 @@ defmodule HotWeb.AuthenticationTest do
     end
   end
 
-  describe "login page accessibility" do
-    test "GET /auth/login is accessible without authentication", %{conn: conn} do
-      conn = get(conn, ~p"/auth/login")
-      assert html_response(conn, 200)
-    end
-  end
-
   describe "public routes accessibility" do
     test "GET /shows is accessible without authentication", %{conn: conn} do
       assert {:ok, _view, _html} = live(conn, ~p"/shows")
+    end
+
+    test "GET /auth/login is accessible without authentication", %{conn: conn} do
+      conn = get(conn, ~p"/auth/login")
+      assert html_response(conn, 200)
     end
   end
 
