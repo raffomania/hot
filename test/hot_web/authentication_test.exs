@@ -9,8 +9,6 @@ defmodule HotWeb.AuthenticationTest do
 
   describe "protected routes without authentication" do
     @protected_routes [
-      "/shows",
-      "/shows/1",
       "/board"
     ]
 
@@ -24,8 +22,6 @@ defmodule HotWeb.AuthenticationTest do
 
   describe "protected LiveView routes without authentication" do
     @protected_liveview_routes [
-      "/shows",
-      "/shows/1",
       "/board"
     ]
 
@@ -44,10 +40,14 @@ defmodule HotWeb.AuthenticationTest do
     end
   end
 
+  describe "public routes accessibility" do
+    test "GET /shows is accessible without authentication", %{conn: conn} do
+      assert {:ok, _view, _html} = live(conn, ~p"/shows")
+    end
+  end
+
   describe "return path preservation" do
     @return_path_routes [
-      "/shows",
-      "/shows/123",
       "/board"
     ]
 
@@ -82,7 +82,7 @@ defmodule HotWeb.AuthenticationTest do
         conn
         |> init_test_session(%{})
         |> put_session(:authenticated, true)
-        |> get(~p"/shows")
+        |> get(~p"/board")
 
       assert html_response(conn, 200)
     end
@@ -93,7 +93,7 @@ defmodule HotWeb.AuthenticationTest do
         |> init_test_session(%{})
         |> put_session(:authenticated, true)
 
-      assert {:ok, _view, _html} = live(conn, ~p"/shows")
+      assert {:ok, _view, _html} = live(conn, ~p"/board")
     end
   end
 

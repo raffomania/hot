@@ -3,6 +3,6 @@ defmodule HotWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert redirected_to(conn) == ~p"/auth/login"
+    assert redirected_to(conn) == ~p"/shows"
   end
 end
