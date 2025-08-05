@@ -20,6 +20,10 @@ if System.get_env("PHX_SERVER") do
   config :hot, HotWeb.Endpoint, server: true
 end
 
+if Config.config_env() in [:dev, :test] do
+  DotenvParser.load_file(".env")
+end
+
 config :hot, trakt_api_key: System.fetch_env!("TRAKT_API_KEY")
 config :hot, trakt_username: System.fetch_env!("TRAKT_USERNAME")
 config :hot, shared_password: System.fetch_env!("SHARED_PASSWORD")

@@ -1,5 +1,3 @@
-set dotenv-load := true
-
 # Start the development server
 run: install-dependencies migrate-db
     mix phx.server
