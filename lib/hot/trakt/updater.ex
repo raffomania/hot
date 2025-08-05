@@ -5,6 +5,10 @@ defmodule Hot.Trakt.Updater do
     GenServer.start_link(__MODULE__, %{})
   end
 
+  def update() do
+    Hot.Trakt.Api.update_db()
+  end
+
   @impl true
   def init(state) do
     schedule_next_update()
@@ -17,10 +21,6 @@ defmodule Hot.Trakt.Updater do
     schedule_next_update()
 
     {:noreply, state}
-  end
-
-  defp update() do
-    Hot.Trakt.Api.update_db()
   end
 
   def schedule_next_update() do

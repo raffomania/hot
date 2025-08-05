@@ -30,6 +30,10 @@ reset-db: && migrate-db
 # Populate the database with seed data
 seed-db: migrate-db
     mix run priv/repo/seeds.exs
+
+# Update database with latest Trakt data
+update-trakt: install-dependencies
+    mix run priv/update_trakt.exs
     
 # Build a container containing a release for production
 build-container: install-dependencies
