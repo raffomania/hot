@@ -1,3 +1,7 @@
+set export := true
+
+MIX_QUIET := "1"
+
 # Start the development server
 run: install-dependencies migrate-db
     mix phx.server
