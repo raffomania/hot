@@ -26,6 +26,10 @@ migrate-db:
 # Drop the database if it exists, then create & migrate a new one
 reset-db: && migrate-db
     mix ash_sqlite.drop
+
+# Populate the database with seed data
+seed-db: migrate-db
+    mix run priv/repo/seeds.exs
     
 # Build a container containing a release for production
 build-container: install-dependencies

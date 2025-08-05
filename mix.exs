@@ -89,8 +89,7 @@ defmodule Hot.MixProject do
         "tailwind hot --minify",
         "esbuild hot --minify",
         "phx.digest"
-      ],
-      "ash.setup": ["ash.setup", "run priv/repo/seeds.exs"]
+      ]
     ]
   end
 end
