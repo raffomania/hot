@@ -673,4 +673,43 @@ defmodule HotWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Converts URLs in text to clickable links.
+
+  ## Examples
+
+      linkify_text("Check out https://example.com for more info")
+      # Returns Phoenix.HTML.Safe content with clickable link
+  """
+  def linkify_text(nil), do: ""
+  def linkify_text(""), do: ""
+
+  def linkify_text(text) when is_binary(text) do
+    # Regex to match URLs (http/https)
+    url_regex = ~r/https?:\/\/[^\s<>"{}|\\^`\[\]]+/i
+
+    # Split text on URLs and rebuild with links
+    parts = Regex.split(url_regex, text, include_captures: true)
+
+    # Build the result using HEEx template without span wrappers
+    assigns = %{parts: parts, url_regex: url_regex}
+
+    ~H"""
+    <%= for part <- @parts do %>
+      <%= if Regex.match?(@url_regex, part) do %>
+        <a
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-600 hover:text-blue-800 underline"
+        >
+          {part}
+        </a>
+      <% else %>
+        {part}
+      <% end %>
+    <% end %>
+    """
+  end
 end

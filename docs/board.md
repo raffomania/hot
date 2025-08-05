@@ -184,5 +184,5 @@ end
 
 When finished with a todo, remove it. Make sure all tests pass on finishing. Update the docs in this file, if necessary.
 
-- When a user is dragging a card, broadcast its current position to other clients using pubsub. use a logical representation of the position, such as the list id and position of the slot the user is currently hovering over. before implementing this, create a detailed technical proposal and stop.
 - Create a new Ash Domain for board-related resources: Call it `Board`. Move Board Lists, Cards, card changes, and the position manager into it.
+- Add a drop area for deleting cards to the right of all lists.

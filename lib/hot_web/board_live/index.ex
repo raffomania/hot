@@ -2,6 +2,7 @@ defmodule HotWeb.BoardLive.Index do
   use HotWeb, :live_view
 
   alias Hot.Trakt.{Card, BoardLists}
+  import HotWeb.CoreComponents, only: [linkify_text: 1]
 
   @board_topic "board:updates"
 
@@ -42,7 +43,7 @@ defmodule HotWeb.BoardLive.Index do
                   type="text"
                   name="value"
                   value={card.title}
-                  class="w-full px-1 font-medium bg-transparent border border-black focus:outline-none"
+                  class="w-full px-2 font-medium bg-transparent border border-black focus:outline-none"
                   phx-hook="FocusAndSelect"
                   id={"edit-card-title-#{card.id}"}
                   phx-key="Escape"
@@ -51,7 +52,7 @@ defmodule HotWeb.BoardLive.Index do
               </form>
             <% else %>
               <h4
-                class={"font-medium px-1 -mx-1 #{if is_nil(card.title) or card.title == "", do: "opacity-50 italic", else: ""}"}
+                class={"mb-2 #{if is_nil(card.title) or card.title == "", do: "opacity-50 italic", else: ""}"}
                 phx-click="edit_card_field"
                 phx-value-card-id={card.id}
                 phx-value-field="title"
@@ -70,7 +71,7 @@ defmodule HotWeb.BoardLive.Index do
                   <input type="hidden" name="field" value="description" />
                   <textarea
                     name="value"
-                    class="w-full px-1 text-sm resize-none"
+                    class="w-full px-2 text-sm resize-none"
                     rows="2"
                     phx-hook="TextareaAutoSave"
                     id={"edit-card-description-#{card.id}"}
@@ -80,18 +81,18 @@ defmodule HotWeb.BoardLive.Index do
                 </form>
               <% else %>
                 <p
-                  class="mt-1 text-sm break-words"
+                  class="text-sm break-words"
                   phx-click="edit_card_field"
                   phx-value-card-id={card.id}
                   phx-value-field="description"
                 >
-                  {card.description}
+                  {linkify_text(card.description)}
                 </p>
               <% end %>
             <% else %>
               <!-- Add description link when no description exists -->
               <p
-                class="mt-1 text-sm italic opacity-50"
+                class="text-sm italic opacity-50"
                 phx-click="edit_card_field"
                 phx-value-card-id={card.id}
                 phx-value-field="description"
