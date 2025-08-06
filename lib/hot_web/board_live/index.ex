@@ -9,10 +9,10 @@ defmodule HotWeb.BoardLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex justify-center mx-4 my-8 space-x-4 overflow-x-auto" id="board-container">
+    <div class="flex px-4 py-8 mx-auto space-x-1 overflow-x-auto" id="board-container">
       <div
         :for={{list_id, list_config} <- @lists}
-        class="flex flex-col p-4 rounded-md bg-neutral-100 min-w-80 max-w-80"
+        class="flex flex-col p-4 pb-10 rounded-md bg-neutral-100 min-w-72 max-w-72"
         phx-hook="BoardList"
         id={"list-#{list_id}"}
         data-list-id={list_id}

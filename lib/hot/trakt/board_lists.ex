@@ -8,9 +8,10 @@ defmodule Hot.Trakt.BoardLists do
 
   @default_lists %{
     1 => %{title: "Trailers", position: 0},
-    2 => %{title: "Watching", position: 1},
-    3 => %{title: "Cancelled", position: 2},
-    4 => %{title: "Finished", position: 3}
+    5 => %{title: "To Watch", position: 1},
+    2 => %{title: "Watching", position: 2},
+    3 => %{title: "Cancelled", position: 3},
+    4 => %{title: "Finished", position: 4}
   }
 
   @doc """
@@ -28,7 +29,7 @@ defmodule Hot.Trakt.BoardLists do
   @doc """
   Gets the complete configuration for all lists.
   """
-  def get_all_lists(), do: get_config()
+  def get_all_lists(), do: get_config() |> Enum.sort_by(fn {_id, config} -> config.position end)
 
   @doc """
   Gets all list IDs in position order.
