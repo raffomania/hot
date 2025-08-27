@@ -318,5 +318,208 @@ defmodule HotWeb.BoardLive.IndexTest do
       sorted_cards = Enum.sort_by(updated_cards, & &1.position)
       assert Enum.map(sorted_cards, & &1.title) == ["Card 1", "Card 3", "Card 2"]
     end
+
+    test "displays archive dropzone with proper accessibility attributes", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, _lv, html} = live(conn, "/board")
+
+      # Check that the archive dropzone exists with proper attributes
+      assert html =~ "id=\"archive-dropzone\""
+      assert html =~ "role=\"region\""
+      assert html =~ "aria-label=\"Archive dropzone - Drop cards here to archive them\""
+      assert html =~ "aria-live=\"polite\""
+      assert html =~ "aria-describedby=\"archive-help-text\""
+
+      # Check that the help text exists and is screen reader only
+      assert html =~ "id=\"archive-help-text\""
+      assert html =~ "class=\"sr-only\""
+      assert html =~ "Shift+Delete keyboard shortcut"
+    end
+
+    test "can archive a card using archive_card event", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, lv, _html} = live(conn, "/board")
+
+      # Create a card
+      lv |> element("button[phx-value-list-id='1']", "+ Add Card") |> render_click()
+      lv |> form("form[phx-submit='save_card_field']", %{value: "Test Card"}) |> render_submit()
+
+      # Get the created card
+      cards = Ash.read!(Card)
+      card = Enum.find(cards, &(&1.title == "Test Card"))
+      assert card != nil
+      assert card.archived == false
+
+      # Archive the card using the archive_card event
+      lv |> render_hook("archive_card", %{card_id: card.id})
+
+      # Card should be archived and removed from the board
+      updated_card = Ash.get!(Card, card.id)
+      assert updated_card.archived == true
+      assert updated_card.archived_at != nil
+
+      # Card should no longer appear on the board
+      html = render(lv)
+      refute html =~ "Test Card"
+    end
+
+    test "archived cards are not visible on the board", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, lv, _html} = live(conn, "/board")
+
+      # Create and archive a card directly
+      {:ok, card} = Ash.create(Card, %{title: "Archived Card", list_id: 1})
+
+      {:ok, _archived_card} =
+        card
+        |> Ash.Changeset.for_update(:archive)
+        |> Ash.update()
+
+      # Load the board - archived card should not be visible
+      html = render(lv)
+      refute html =~ "Archived Card"
+    end
+
+    test "archive_card event broadcasts to board and archive pages", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, lv, _html} = live(conn, "/board")
+
+      # Create a card
+      lv |> element("button[phx-value-list-id='1']", "+ Add Card") |> render_click()
+
+      lv
+      |> form("form[phx-submit='save_card_field']", %{value: "Broadcast Test Card"})
+      |> render_submit()
+
+      # Get the created card
+      cards = Ash.read!(Card)
+      card = Enum.find(cards, &(&1.title == "Broadcast Test Card"))
+
+      # Subscribe to both topics to verify broadcasts
+      Phoenix.PubSub.subscribe(Hot.PubSub, "board:updates")
+      Phoenix.PubSub.subscribe(Hot.PubSub, "archive:updates")
+
+      # Archive the card
+      lv |> render_hook("archive_card", %{card_id: card.id})
+
+      # Should receive board update broadcast
+      assert_receive {:board_updated, %{action: :card_archived, card: archived_card}}, 1000
+      assert archived_card.id == card.id
+      assert archived_card.archived == true
+
+      # Should also receive archive page broadcast  
+      assert_receive {:card_archived, archived_card}, 1000
+      assert archived_card.id == card.id
+      assert archived_card.archived == true
+    end
+
+    test "multiple clients see archive updates in real-time", %{conn: conn} do
+      # Start two separate LiveView processes
+      conn1 = authenticate_conn(conn)
+      conn2 = authenticate_conn(Phoenix.ConnTest.build_conn())
+
+      {:ok, lv1, _html1} = live(conn1, "/board")
+      {:ok, lv2, _html2} = live(conn2, "/board")
+
+      # Create a card on client 1
+      lv1 |> element("button[phx-value-list-id='1']", "+ Add Card") |> render_click()
+
+      lv1
+      |> form("form[phx-submit='save_card_field']", %{value: "Multi-Client Test"})
+      |> render_submit()
+
+      # Both clients should see the card
+      html1 = render(lv1)
+      html2 = render(lv2)
+      assert html1 =~ "Multi-Client Test"
+      assert html2 =~ "Multi-Client Test"
+
+      # Get the created card
+      cards = Ash.read!(Card)
+      card = Enum.find(cards, &(&1.title == "Multi-Client Test"))
+
+      # Archive the card on client 1
+      lv1 |> render_hook("archive_card", %{card_id: card.id})
+
+      # Both clients should no longer see the card
+      html1_after = render(lv1)
+      html2_after = render(lv2)
+      refute html1_after =~ "Multi-Client Test"
+      refute html2_after =~ "Multi-Client Test"
+    end
+
+    test "cards are focusable and have proper accessibility attributes", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, lv, _html} = live(conn, "/board")
+
+      # Create a card
+      lv |> element("button[phx-value-list-id='1']", "+ Add Card") |> render_click()
+
+      # Submit the card form that appears after clicking add card
+      lv
+      |> form("form[phx-submit='save_card_field']", %{value: "Focusable Card"})
+      |> render_submit()
+
+      html = render(lv)
+
+      # Check that cards have proper accessibility attributes
+      assert html =~ "tabindex=\"0\""
+      assert html =~ "role=\"button\""
+      assert html =~ "aria-label=\"Card: Focusable Card - Press Shift+Delete to archive\""
+      assert html =~ "focus:outline-none focus:ring-2 focus:ring-blue-500"
+    end
+
+    test "archive dropzone starts hidden and has proper styling", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, _lv, html} = live(conn, "/board")
+
+      # Check that dropzone starts with hidden classes
+      assert html =~ "opacity-0 scale-75 transition-all duration-200 pointer-events-none"
+
+      # Check basic styling classes
+      assert html =~ "fixed right-6 top-1/2 transform -translate-y-1/2 w-32 h-40"
+      assert html =~ "border-4 border-dashed border-red-400 bg-red-50 rounded-lg"
+      assert html =~ "flex flex-col items-center justify-center"
+      assert html =~ "z-50"
+
+      # Check archive icon and text
+      assert html =~ "Archive"
+      assert html =~ "text-red-600"
+    end
+
+    test "error handling when archiving non-existent card", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, lv, _html} = live(conn, "/board")
+
+      # Try to archive a card that doesn't exist
+      lv |> render_hook("archive_card", %{card_id: "non-existent-id"})
+
+      # LiveView should handle the error gracefully without crashing
+      # The page should still be functional
+      html = render(lv)
+      assert html =~ "Board"
+      assert html =~ "new"
+      assert html =~ "watching"
+    end
+
+    test "archive_card event handles malformed parameters", %{conn: conn} do
+      conn = authenticate_conn(conn)
+      {:ok, lv, _html} = live(conn, "/board")
+
+      # Try with missing card_id
+      lv |> render_hook("archive_card", %{})
+
+      # Try with nil card_id
+      lv |> render_hook("archive_card", %{card_id: nil})
+
+      # Try with empty string card_id
+      lv |> render_hook("archive_card", %{card_id: ""})
+
+      # LiveView should handle all these gracefully
+      html = render(lv)
+      assert html =~ "Board"
+      assert html =~ "new"
+      assert html =~ "watching"
+    end
   end
 end

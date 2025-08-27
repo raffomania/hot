@@ -32,7 +32,7 @@ defmodule Hot.Trakt.Changes.AssignPosition do
 
   defp get_last_position_in_list(list_id) do
     Card
-    |> Ash.Query.filter(list_id == ^list_id)
+    |> Ash.Query.filter(list_id == ^list_id and archived == false)
     |> Ash.Query.sort(position: :desc)
     |> Ash.Query.limit(1)
     |> Ash.read!()
@@ -93,7 +93,7 @@ defmodule Hot.Trakt.Changes.AssignPosition do
   def rebalance_list(list_id) do
     cards_in_list =
       Card
-      |> Ash.Query.filter(list_id == ^list_id)
+      |> Ash.Query.filter(list_id == ^list_id and archived == false)
       |> Ash.Query.sort(position: :asc)
       |> Ash.read!()
 

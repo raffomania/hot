@@ -216,5 +216,59 @@ defmodule Hot.Trakt.CardTest do
 
       assert length(all_cards) == 2
     end
+
+    test "archived cards do not affect position calculations for active cards" do
+      # Create 3 cards in the same list
+      assert {:ok, _card1} =
+               Ash.create(Card, %{title: "First", list_id: 5})
+
+      assert {:ok, card2} =
+               Ash.create(Card, %{title: "Second", list_id: 5})
+
+      assert {:ok, card3} =
+               Ash.create(Card, %{title: "Third", list_id: 5})
+
+      # Archive the middle card
+      assert {:ok, _archived_card} =
+               card2
+               |> Ash.Changeset.for_update(:archive)
+               |> Ash.update()
+
+      # Create a new card - it should get positioned correctly, ignoring the archived card
+      assert {:ok, _new_card} =
+               Ash.create(Card, %{title: "New Card", list_id: 5})
+
+      # Get all active cards in order
+      active_cards =
+        Card
+        |> Ash.Query.for_read(:active_cards)
+        |> Ash.Query.filter(list_id == 5)
+        |> Ash.Query.sort(position: :asc)
+        |> Ash.read!()
+
+      # Should only have 3 active cards: card1, card3, new_card
+      assert length(active_cards) == 3
+
+      # Positions should be: 10.0, 30.0, 40.0 (the new card gets the next available position)
+      assert Enum.at(active_cards, 0).title == "First"
+      assert Enum.at(active_cards, 0).position == 10.0
+      assert Enum.at(active_cards, 1).title == "Third"
+      assert Enum.at(active_cards, 1).position == 30.0
+      assert Enum.at(active_cards, 2).title == "New Card"
+      assert Enum.at(active_cards, 2).position == 40.0
+
+      # Now test moving a card - it should ignore archived cards in position calculations
+      assert {:ok, moved_card} =
+               card3
+               |> Ash.Changeset.for_update(:move_to_position, %{
+                 new_list_id: 5,
+                 # Move to beginning
+                 target_index: 0
+               })
+               |> Ash.update()
+
+      # The moved card should get position between 0 and card1 (10.0), so 5.0
+      assert moved_card.position == 5.0
+    end
   end
 end

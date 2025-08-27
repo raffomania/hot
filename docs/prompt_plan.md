@@ -86,7 +86,22 @@ Create a dedicated archive page to display archived cards. This should include:
 The archive should provide a clean, organized view of historical cards with easy restoration capabilities.
 ```
 
-## 4. Add Archive Dropzone on Board Page
+## 4. Add Archive Dropzone on Board Page ✅ **COMPLETED**
+
+**Status:** ✅ **COMPLETED**
+
+**Implementation Summary:**
+- Added visual archive dropzone in the lower right corner that appears only when dragging cards
+- Created responsive dropzone with archive icon, "Archive" text, and smooth CSS animations
+- Integrated with existing SortableJS system to handle drop events without interfering with list-to-list card movement
+- Added JavaScript hooks (ArchiveDropzone) that show/hide dropzone during drag operations
+- Implemented drag-over visual feedback with color and scale changes
+- Created LiveView event handler `archive_card` that uses Ash changeset pattern for archiving
+- Added real-time updates via PubSub broadcasting to both board and archive pages
+- Included accessibility features: keyboard shortcut (Shift+Delete), ARIA labels, screen reader support, and focus management
+- Added comprehensive test coverage (10 new tests) covering dropzone rendering, archive functionality, real-time updates, error handling, accessibility, and malformed parameter handling
+- All archive-related board tests pass (20 tests, 0 failures)
+- Archive dropzone provides smooth visual feedback with success animation and screen reader announcements
 
 **Prompt:**
 ```

@@ -31,7 +31,7 @@ defmodule Hot.Trakt.Changes.MoveToPosition do
   defp calculate_position_for_move(list_id, target_index, exclude_card_id) do
     existing_cards =
       Card
-      |> Ash.Query.filter(list_id == ^list_id and id != ^exclude_card_id)
+      |> Ash.Query.filter(list_id == ^list_id and id != ^exclude_card_id and archived == false)
       |> Ash.Query.sort(position: :asc)
       |> Ash.read!()
 
@@ -45,7 +45,9 @@ defmodule Hot.Trakt.Changes.MoveToPosition do
 
         existing_cards =
           Card
-          |> Ash.Query.filter(list_id == ^list_id and id != ^exclude_card_id)
+          |> Ash.Query.filter(
+            list_id == ^list_id and id != ^exclude_card_id and archived == false
+          )
           |> Ash.Query.sort(position: :asc)
           |> Ash.read!()
 
