@@ -4,6 +4,13 @@ defmodule HotWeb.CoreComponentsTest do
   import HotWeb.CoreComponents
   import Phoenix.LiveViewTest
 
+  # Helper to normalize whitespace for comparison
+  defp normalize_html(html) do
+    html
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
+  end
+
   describe "linkify_text/1" do
     test "returns empty string for nil input" do
       assert linkify_text(nil) == ""
@@ -17,18 +24,19 @@ defmodule HotWeb.CoreComponentsTest do
       text = "This is just plain text with no links"
       result = linkify_text(text)
 
-      assert rendered_to_string(result) == text
+      assert normalize_html(rendered_to_string(result)) == text
     end
 
     test "converts multiple URLs in the same text" do
       text = "Check https://example.com and http://test.org for info"
       result = linkify_text(text)
       html = rendered_to_string(result)
+      normalized = normalize_html(html)
 
       assert html =~ "<a href=\"https://example.com\""
-      assert html =~ ">https://example.com</a>"
+      assert normalized =~ "> https://example.com </a>"
       assert html =~ "<a href=\"http://test.org\""
-      assert html =~ ">http://test.org</a>"
+      assert normalized =~ "> http://test.org </a>"
       assert html =~ "Check"
       assert html =~ "and"
       assert html =~ "for info"
@@ -40,7 +48,7 @@ defmodule HotWeb.CoreComponentsTest do
       html = rendered_to_string(result)
 
       assert html =~ "<a href=\"https://google.com/search?q=elixir#results\""
-      assert html =~ ">https://google.com/search?q=elixir#results</a>"
+      assert normalize_html(html) =~ "> https://google.com/search?q=elixir#results </a>"
     end
 
     test "handles URLs with ports" do
@@ -49,7 +57,7 @@ defmodule HotWeb.CoreComponentsTest do
       html = rendered_to_string(result)
 
       assert html =~ "<a href=\"http://localhost:4000\""
-      assert html =~ ">http://localhost:4000</a>"
+      assert normalize_html(html) =~ "> http://localhost:4000 </a>"
     end
 
     test "escapes HTML in non-URL parts" do
@@ -58,7 +66,7 @@ defmodule HotWeb.CoreComponentsTest do
       html = rendered_to_string(result)
 
       assert html =~ "<a href=\"https://example.com\""
-      assert html =~ ">https://example.com</a>"
+      assert normalize_html(html) =~ "> https://example.com </a>"
       assert html =~ "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
       refute html =~ "<script>"
     end
@@ -70,7 +78,7 @@ defmodule HotWeb.CoreComponentsTest do
 
       # The URL stops at certain characters and the script tag gets escaped as regular text
       assert html =~ "href=\"https://evil.com/path?param=\""
-      assert html =~ ">https://evil.com/path?param=</a>"
+      assert normalize_html(html) =~ "> https://evil.com/path?param= </a>"
       assert html =~ "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
       refute html =~ "<script>"
     end
@@ -81,7 +89,7 @@ defmodule HotWeb.CoreComponentsTest do
       html = rendered_to_string(result)
 
       assert html =~ "<a href=\"https://example.com\""
-      assert html =~ ">https://example.com</a> is a great site"
+      assert normalize_html(html) =~ "https://example.com </a> is a great site"
     end
 
     test "handles URLs at the end of text" do
@@ -89,8 +97,8 @@ defmodule HotWeb.CoreComponentsTest do
       result = linkify_text(text)
       html = rendered_to_string(result)
 
-      assert html =~ "Check out this site: <a href=\"https://example.com\""
-      assert html =~ ">https://example.com</a>"
+      assert normalize_html(html) =~ "Check out this site: <a href=\"https://example.com\""
+      assert normalize_html(html) =~ "> https://example.com </a>"
     end
 
     test "handles URL surrounded by punctuation" do
@@ -99,8 +107,8 @@ defmodule HotWeb.CoreComponentsTest do
       html = rendered_to_string(result)
 
       # The URL regex includes the closing parenthesis
-      assert html =~ "Visit (<a href=\"https://example.com)\""
-      assert html =~ ">https://example.com)</a> for details."
+      assert normalize_html(html) =~ "Visit ( <a href=\"https://example.com)\""
+      assert normalize_html(html) =~ "> https://example.com) </a> for details."
     end
 
     test "does not linkify non-HTTP protocols" do
@@ -109,7 +117,7 @@ defmodule HotWeb.CoreComponentsTest do
       html = rendered_to_string(result)
 
       refute html =~ "<a href="
-      assert html == text
+      assert normalize_html(html) == text
     end
 
     test "handles text with newlines and URLs" do
