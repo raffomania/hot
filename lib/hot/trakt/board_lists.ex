@@ -7,11 +7,8 @@ defmodule Hot.Trakt.BoardLists do
   """
 
   @default_lists %{
-    1 => %{title: "Trailers", position: 0},
-    5 => %{title: "To Watch", position: 1},
-    2 => %{title: "Watching", position: 2},
-    3 => %{title: "Cancelled", position: 3},
-    4 => %{title: "Finished", position: 4}
+    1 => %{title: "new", position: 0},
+    2 => %{title: "watching", position: 1}
   }
 
   @doc """

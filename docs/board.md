@@ -4,7 +4,7 @@ This document provides technical documentation for the Kanban-style board featur
 
 ## Architecture Overview
 
-The board is a real-time collaborative interface for organizing TV shows and tasks into predefined lists and cards using Phoenix LiveView and Ash Framework. The board uses a fixed set of four lists: "trailers", "watching", "cancelled", and "finished".
+The board is a real-time collaborative interface for organizing TV shows and tasks into predefined lists and cards using Phoenix LiveView and Ash Framework. The board uses a fixed set of two lists: "new" and "watching".
 
 ### Technology Stack
 
@@ -25,7 +25,7 @@ The board implements two primary Ash resources within the `Hot.Trakt` domain:
 - Unique title constraint for list identification
 - One-to-many relationship with cards
 - Timestamps for audit tracking
-- Four predefined lists: "trailers" (position 0), "watching" (position 1), "cancelled" (position 2), "finished" (position 3)
+- Two predefined lists: "new" (position 0), "watching" (position 1)
 
 **Card Resource** (`lib/hot/trakt/card.ex`):
 - UUID v7 primary key with position-based ordering within lists
@@ -111,7 +111,7 @@ Database queries use efficient position-based sorting via `Ash.Query.sort(positi
 
 ### Current Capabilities
 
-- Predefined list structure: trailers, watching, cancelled, finished
+- Predefined list structure: new, watching
 - Full CRUD operations for cards within predefined lists
 - Real-time multi-client collaboration
 - Drag and drop card movement between lists

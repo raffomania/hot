@@ -14,10 +14,8 @@ defmodule HotWeb.BoardLive.IndexTest do
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/board")
       assert html =~ "Board"
-      assert html =~ "Trailers"
-      assert html =~ "Watching"
-      assert html =~ "Cancelled"
-      assert html =~ "Finished"
+      assert html =~ "new"
+      assert html =~ "watching"
     end
 
     test "displays predefined lists and cards", %{conn: conn} do
@@ -34,7 +32,7 @@ defmodule HotWeb.BoardLive.IndexTest do
 
       # The card should now be visible
       html = render(lv)
-      assert html =~ "Trailers"
+      assert html =~ "new"
       assert html =~ "Test Card"
     end
 
@@ -42,7 +40,7 @@ defmodule HotWeb.BoardLive.IndexTest do
       conn = authenticate_conn(conn)
       {:ok, lv, _html} = live(conn, "/board")
 
-      # Click add card button for the trailers list - this should immediately create a card and enter edit mode
+      # Click add card button for the new list - this should immediately create a card and enter edit mode
       assert lv
              |> element("button[phx-value-list-id='1']", "+ Add Card")
              |> render_click()

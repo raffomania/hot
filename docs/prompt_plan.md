@@ -18,7 +18,21 @@ Transform the current four-column board layout ("trailers", "watching", "cancell
 - All existing functionality works with the simplified layout
 - All board and card tests pass (19 tests, 0 failures)
 
-## 2. Modify Card Model to Add Archive Status
+## 2. Modify Card Model to Add Archive Status ✅ **COMPLETED**
+
+**Status:** ✅ **COMPLETED**
+
+**Implementation Summary:**
+- Added `archived` boolean field to Card resource with default: false
+- Added `archived_at` timestamp field to track when cards were archived
+- Created custom Ash action `:archive` that sets archived=true and archived_at=current_timestamp
+- Created custom Ash action `:unarchive` that sets archived=false, archived_at=nil, and moves to "new" list (list_id 1)
+- Updated queries: created `:active_cards` read action to exclude archived cards, `:archived_cards` to fetch only archived
+- Updated BoardLive.Index to use `:active_cards` action, so archived cards are hidden from main board
+- Generated and ran database migration for new fields with default values
+- Added comprehensive tests covering archive/unarchive functionality, query filtering, and default behaviors
+- All Card resource tests pass (14 tests, 0 failures)
+- All board LiveView tests pass (11 tests, 0 failures)
 
 **Prompt:**
 ```

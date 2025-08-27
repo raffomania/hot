@@ -246,6 +246,7 @@ defmodule HotWeb.BoardLive.Index do
 
     cards =
       Card
+      |> Ash.Query.for_read(:active_cards)
       |> Ash.Query.sort(position: :asc)
       |> Ash.Query.load(:show)
       |> Ash.read!()

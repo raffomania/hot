@@ -10,8 +10,20 @@ defmodule Hot.Trakt.Card do
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults [:destroy]
     default_accept [:title, :description, :show_id]
+
+    read :read do
+      primary? true
+    end
+
+    read :active_cards do
+      filter expr(archived == false)
+    end
+
+    read :archived_cards do
+      filter expr(archived == true)
+    end
 
     create :create do
       primary? true
@@ -45,6 +57,26 @@ defmodule Hot.Trakt.Card do
 
       change Hot.Trakt.Changes.RebalancePositions
     end
+
+    # Archive a card
+    update :archive do
+      accept []
+      require_atomic? false
+
+      change set_attribute(:archived, true)
+      change set_attribute(:archived_at, &DateTime.utc_now/0)
+    end
+
+    # Unarchive a card and move to "new" list
+    update :unarchive do
+      accept []
+      require_atomic? false
+
+      change set_attribute(:archived, false)
+      change set_attribute(:archived_at, nil)
+      change set_attribute(:list_id, 1)
+      change Hot.Trakt.Changes.AssignPosition
+    end
   end
 
   attributes do
@@ -64,6 +96,15 @@ defmodule Hot.Trakt.Card do
 
     attribute :list_id, :integer do
       allow_nil? false
+    end
+
+    attribute :archived, :boolean do
+      allow_nil? false
+      default false
+    end
+
+    attribute :archived_at, :utc_datetime do
+      allow_nil? true
     end
 
     timestamps()

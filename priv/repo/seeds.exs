@@ -12,9 +12,9 @@
 
 alias Hot.Trakt.{Card}
 
-# Create sample cards across different lists
+# Create sample cards across the two lists
 cards_data = [
-  # Trailers list (list_id: 1)
+  # New list (list_id: 1)
   %{
     title: "House of the Dragon Season 3",
     description: "Upcoming season looks epic!",
@@ -28,6 +28,11 @@ cards_data = [
   %{
     title: "Dune: Part Three",
     description: "Paul's journey continues",
+    list_id: 1
+  },
+  %{
+    title: "Firefly Reboot",
+    description: "Maybe this time it won't get cancelled",
     list_id: 1
   },
 
@@ -47,83 +52,76 @@ cards_data = [
     description: "Addams family spinoff",
     list_id: 2
   },
-
-  # Cancelled list (list_id: 3)
-  %{
-    title: "Game of Thrones",
-    description: "Disappointing final season",
-    list_id: 3
-  },
-  %{title: "Firefly", description: "Cancelled too soon", list_id: 3},
-
-  # Finished list (list_id: 4)
   %{
     title: "Breaking Bad",
     description: "Perfect ending to a perfect show",
-    list_id: 4
+    list_id: 2
   },
   %{
     title: "The Office",
     description: "That's what she said!",
-    list_id: 4
+    list_id: 2
   },
   %{
     title: "Avatar: The Last Airbender",
     description: "Masterpiece of animation",
-    list_id: 4
-  },
-  %{
-    title: "Chernobyl",
-    description: "Haunting and brilliant",
-    list_id: 4
-  },
-  %{
-    title: "Better Call Saul",
-    description: "Saul's origin story",
-    list_id: 4
-  },
-  %{
-    title: "The Wire",
-    description: "Baltimore crime drama",
-    list_id: 4
-  },
-  %{
-    title: "Westworld",
-    description: "Complex AI narrative",
-    list_id: 4
-  },
-  %{
-    title: "True Detective",
-    description: "Season 1 was phenomenal",
-    list_id: 4
-  },
-  %{
-    title: "Mad Men",
-    description: "60s advertising drama",
-    list_id: 4
-  },
-  %{
-    title: "The Sopranos",
-    description: "Classic mob series",
-    list_id: 4
-  },
-  %{
-    title: "Lost",
-    description: "Island mystery show",
-    list_id: 4
-  },
-  %{
-    title: "Friends",
-    description: "Classic sitcom",
-    list_id: 4
+    list_id: 2
   }
 ]
 
-# Create cards
+# Create active cards
 Enum.each(cards_data, fn card_attrs ->
   Ash.create!(Card, card_attrs)
 end)
 
-IO.puts(
-  "📊 Created #{length(cards_data)} cards across 4 lists (1: Trailers, 2: Watching, 3: Cancelled, 4: Finished)"
-)
+# Create archived cards (shows that were previously tracked but are now archived)
+archived_cards_data = [
+  %{
+    title: "Game of Thrones",
+    description: "Great until season 8... we don't talk about season 8",
+    # Was in watching before being archived
+    list_id: 2
+  },
+  %{
+    title: "Lost",
+    description: "Still confused about the ending",
+    list_id: 2
+  },
+  %{
+    title: "Sherlock Season 5",
+    description: "Never happened, just like the movie",
+    # Was in new but never materialized
+    list_id: 1
+  },
+  %{
+    title: "Westworld Season 4",
+    description: "Got too confusing, archived for mental health",
+    list_id: 2
+  },
+  %{
+    title: "True Detective Season 4",
+    description: "Rumored but never confirmed",
+    list_id: 1
+  },
+  %{
+    title: "Community Movie",
+    description: "#SixSeasonsAndAMovie - still waiting for the movie part",
+    list_id: 1
+  }
+]
+
+# Create and immediately archive these cards
+archived_cards =
+  Enum.map(archived_cards_data, fn card_attrs ->
+    card = Ash.create!(Card, card_attrs)
+    # Archive the card
+    archived_card =
+      card
+      |> Ash.Changeset.for_update(:archive)
+      |> Ash.update!()
+
+    archived_card
+  end)
+
+IO.puts("📊 Created #{length(cards_data)} active cards across 2 lists (1: new, 2: watching)")
+IO.puts("🗃️  Created #{length(archived_cards)} archived cards for testing archive functionality")

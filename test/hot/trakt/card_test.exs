@@ -109,4 +109,112 @@ defmodule Hot.Trakt.CardTest do
       assert {:error, _} = Ash.get(Card, card.id)
     end
   end
+
+  describe "archive functionality" do
+    test "cards are created with archived=false by default" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "Test Card", list_id: 1})
+
+      assert card.archived == false
+      assert card.archived_at == nil
+    end
+
+    test "can archive a card" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Archive", list_id: 1})
+
+      assert {:ok, archived_card} =
+               card
+               |> Ash.Changeset.for_update(:archive)
+               |> Ash.update()
+
+      assert archived_card.archived == true
+      assert archived_card.archived_at != nil
+      assert archived_card.list_id == card.list_id
+    end
+
+    test "can unarchive a card" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Unarchive", list_id: 2})
+
+      # First archive it
+      assert {:ok, archived_card} =
+               card
+               |> Ash.Changeset.for_update(:archive)
+               |> Ash.update()
+
+      # Then unarchive it
+      assert {:ok, unarchived_card} =
+               archived_card
+               |> Ash.Changeset.for_update(:unarchive)
+               |> Ash.update()
+
+      assert unarchived_card.archived == false
+      assert unarchived_card.archived_at == nil
+      # Should move to "new" list (list_id 1)
+      assert unarchived_card.list_id == 1
+    end
+
+    test "active_cards query excludes archived cards" do
+      # Create some cards
+      assert {:ok, card1} =
+               Ash.create(Card, %{title: "Active Card", list_id: 1})
+
+      assert {:ok, card2} =
+               Ash.create(Card, %{title: "To Archive", list_id: 1})
+
+      # Archive one card
+      assert {:ok, _archived_card} =
+               card2
+               |> Ash.Changeset.for_update(:archive)
+               |> Ash.update()
+
+      # Query active cards
+      active_cards = Ash.read!(Card, action: :active_cards)
+
+      assert length(active_cards) == 1
+      assert Enum.at(active_cards, 0).id == card1.id
+    end
+
+    test "archived_cards query returns only archived cards" do
+      # Create some cards
+      assert {:ok, _card1} =
+               Ash.create(Card, %{title: "Active Card", list_id: 1})
+
+      assert {:ok, card2} =
+               Ash.create(Card, %{title: "To Archive", list_id: 1})
+
+      # Archive one card
+      assert {:ok, archived_card} =
+               card2
+               |> Ash.Changeset.for_update(:archive)
+               |> Ash.update()
+
+      # Query archived cards
+      archived_cards = Ash.read!(Card, action: :archived_cards)
+
+      assert length(archived_cards) == 1
+      assert Enum.at(archived_cards, 0).id == archived_card.id
+    end
+
+    test "primary read action returns all cards including archived" do
+      # Create some cards
+      assert {:ok, _card1} =
+               Ash.create(Card, %{title: "Active Card", list_id: 1})
+
+      assert {:ok, card2} =
+               Ash.create(Card, %{title: "To Archive", list_id: 1})
+
+      # Archive one card
+      assert {:ok, _archived_card} =
+               card2
+               |> Ash.Changeset.for_update(:archive)
+               |> Ash.update()
+
+      # Query all cards using primary read action
+      all_cards = Ash.read!(Card)
+
+      assert length(all_cards) == 2
+    end
+  end
 end
