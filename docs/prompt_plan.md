@@ -74,7 +74,7 @@ The dropzones should provide clear visual distinction between finishing and canc
 
 ## 7. Update Archive Page with Finished and Cancelled Sections
 
-**Status:** 📋 **PLANNED**
+**Status:** ✅ **COMPLETED**
 
 **Implementation Plan:**
 - Modify archive page to show finished shows at the top in a dedicated section

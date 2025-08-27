@@ -20,15 +20,17 @@ defmodule HotWeb.ArchiveLive.IndexTest do
     test "displays empty state when no archived cards exist", %{conn: conn} do
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
-      assert html =~ "No archived cards yet"
-      assert html =~ "Cards you archive will appear here"
+      assert html =~ "No finished shows yet"
+      assert html =~ "No cancelled shows yet"
+      assert html =~ "Shows you complete will appear here"
+      assert html =~ "Shows you drop will appear here"
     end
 
     test "displays archived cards with correct information", %{conn: conn} do
-      # Create and archive a card
+      # Create and archive a card as finished
       {:ok, card} =
         Ash.create(Card, %{
-          title: "Test Archived Card",
+          title: "Test Finished Card",
           description: "This is a test description",
           list_id: 1
         })
@@ -38,11 +40,72 @@ defmodule HotWeb.ArchiveLive.IndexTest do
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
 
-      assert html =~ "Test Archived Card"
+      assert html =~ "Test Finished Card"
       assert html =~ "This is a test description"
-      assert html =~ "Archived"
+      assert html =~ "Finished"
       assert html =~ "Restore"
-      refute html =~ "No archived cards yet"
+      assert html =~ "✅ Finished Shows"
+      refute html =~ "No finished shows yet"
+    end
+
+    test "displays cancelled cards in separate section", %{conn: conn} do
+      # Create and cancel a card
+      {:ok, card} =
+        Ash.create(Card, %{
+          title: "Test Cancelled Card",
+          description: "This was cancelled",
+          list_id: 1
+        })
+
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_cancelled)
+
+      conn = authenticate_conn(conn)
+      {:ok, _lv, html} = live(conn, "/archive")
+
+      assert html =~ "Test Cancelled Card"
+      assert html =~ "This was cancelled"
+      assert html =~ "Cancelled"
+      assert html =~ "Restore"
+      assert html =~ "❌ Cancelled Shows"
+      refute html =~ "No cancelled shows yet"
+    end
+
+    test "displays both finished and cancelled cards in their respective sections", %{conn: conn} do
+      # Create finished card
+      {:ok, finished_card} =
+        Ash.create(Card, %{
+          title: "Finished Show",
+          description: "Completed watching",
+          list_id: 1
+        })
+
+      {:ok, _} = Ash.update(finished_card, %{}, action: :mark_finished)
+
+      # Create cancelled card
+      {:ok, cancelled_card} =
+        Ash.create(Card, %{
+          title: "Cancelled Show",
+          description: "Dropped watching",
+          list_id: 1
+        })
+
+      {:ok, _} = Ash.update(cancelled_card, %{}, action: :mark_cancelled)
+
+      conn = authenticate_conn(conn)
+      {:ok, _lv, html} = live(conn, "/archive")
+
+      # Check finished section
+      assert html =~ "✅ Finished Shows"
+      assert html =~ "Finished Show"
+      assert html =~ "Completed watching"
+
+      # Check cancelled section
+      assert html =~ "❌ Cancelled Shows"
+      assert html =~ "Cancelled Show"
+      assert html =~ "Dropped watching"
+
+      # Verify counts
+      assert html =~ "1" # Count badge for finished
     end
 
     test "displays archived cards ordered by archive date (newest first)", %{conn: conn} do
@@ -188,7 +251,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
       {:ok, lv, html} = live(conn, "/archive")
 
       # Initially should show empty state
-      assert html =~ "No archived cards yet"
+      assert html =~ "No finished shows yet"
 
       # Create and archive a card (simulating action from board)
       {:ok, card} =
@@ -211,7 +274,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
       html = render(lv)
       assert html =~ "New Archived Card"
       assert html =~ "Just archived"
-      refute html =~ "No archived cards yet"
+      refute html =~ "No finished shows yet"
     end
 
     test "receives real-time updates when cards are unarchived from board", %{conn: conn} do
@@ -294,7 +357,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
 
       # Should show today's date in ISO format (YYYY-MM-DD)
       today = Date.to_string(Date.utc_today())
-      assert html =~ "Archived #{today}"
+      assert html =~ "Finished #{today}"
     end
 
     test "handles missing archive dates gracefully", %{conn: conn} do
@@ -305,14 +368,23 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      # Use the mark_finished action instead of direct SQL
-      {:ok, _} = Ash.update(card, %{}, action: :mark_finished)
+      # Mark as finished first to set archived_at
+      {:ok, finished_card} = Ash.update(card, %{}, action: :mark_finished)
+
+      # Then manually clear the archived_at to simulate missing date
+      query = """
+      UPDATE cards SET archived_at = NULL WHERE id = ?
+      """
+      
+      Ash.DataLayer.transaction(Card, fn ->
+        Ecto.Adapters.SQL.query!(Hot.Repo, query, [finished_card.id])
+      end)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
 
       assert html =~ "Missing Date Card"
-      assert html =~ "Archived Unknown"
+      assert html =~ "Finished Unknown"
     end
 
     test "multiple clients receive real-time archive updates", %{conn: conn} do
