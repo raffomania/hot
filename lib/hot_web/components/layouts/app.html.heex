@@ -9,6 +9,12 @@
     <a href={~p"/board"} class={[if(@current_page == :board, do: "font-bold", else: "underline")]}>
       Board
     </a>
+    <a
+      href={~p"/archive"}
+      class={[if(@current_page == :archive, do: "font-bold", else: "underline")]}
+    >
+      Archive
+    </a>
   </div>
 </nav>
 <main>

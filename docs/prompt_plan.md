@@ -50,7 +50,23 @@ Add archive functionality to the Card resource model in the Hot.Trakt domain. Th
 Ensure archived cards are completely hidden from the main board but can be retrieved separately for the archive view.
 ```
 
-## 3. Create Archive Page
+## 3. Create Archive Page ✅ **COMPLETED**
+
+**Status:** ✅ **COMPLETED**
+
+**Implementation Summary:**
+- Created new LiveView at `lib/hot_web/archive_live/index.ex` that displays archived cards in a clean grid layout
+- Added `/archive` route in router with authentication protection via `:protected` pipeline
+- Designed responsive archive page layout showing archived cards with titles, descriptions, archive dates, and show information
+- Implemented unarchive functionality that moves cards back to the "new" list (list_id 1) on the main board
+- Added "Archive" navigation link in main app layout header with proper highlighting for current page
+- Used Tailwind CSS styling similar to main board but optimized for archive viewing
+- Added real-time updates via PubSub for `card_archived` and `card_unarchived` events
+- Included "Back to Board" navigation link for easy navigation
+- Written comprehensive tests covering all functionality: empty states, card display, unarchive actions, real-time updates, authentication, edge cases, and PubSub integration
+- All 16 archive-specific tests pass successfully
+- Archive page handles missing titles/descriptions gracefully and formats dates properly
+- Real-time updates work across multiple clients via Phoenix PubSub
 
 **Prompt:**
 ```

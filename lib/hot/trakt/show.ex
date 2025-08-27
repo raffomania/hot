@@ -16,6 +16,7 @@ defmodule Hot.Trakt.Show do
     default_accept [:title, :trakt_id, :imdb_id]
 
     create :create do
+      primary? true
       upsert? true
       upsert_identity :unique_trakt_id
 

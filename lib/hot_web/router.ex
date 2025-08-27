@@ -41,6 +41,7 @@ defmodule HotWeb.Router do
 
     live_session :protected, on_mount: HotWeb.SharedAuth do
       live "/board", BoardLive.Index, :index
+      live "/archive", ArchiveLive.Index, :index
     end
   end
 
