@@ -1,129 +1,6 @@
-# Prompt Plan: Board Layout Changes and Archive Feature
+# Prompt Plan: Enhanced Archive Feature with Finished/Cancelled Status
 
-This document contains the prompt plan for modifying the board layout and adding archive functionality to the Hot TV show tracking application.
-
-## Overview
-
-Transform the current four-column board layout ("trailers", "watching", "cancelled", "finished") into a simplified two-column layout ("new", "watching") with archive functionality for removed cards.
-
-## 1. Modify Board Columns to "new" and "watching" ✅ **COMPLETED**
-
-**Status:** ✅ **COMPLETED**
-
-**Implementation Summary:**
-- Updated `Hot.Trakt.BoardLists` to define only two lists: "new" (position 0, list_id 1) and "watching" (position 1, list_id 2)
-- Updated `priv/repo/seeds.exs` to create sample cards across the two lists instead of four
-- Updated tests in `test/hot_web/board_live/index_test.exs` to expect the new list names
-- Updated documentation in `docs/board.md` to reflect the new two-column structure
-- All existing functionality works with the simplified layout
-- All board and card tests pass (19 tests, 0 failures)
-
-## 2. Modify Card Model to Add Archive Status ✅ **COMPLETED**
-
-**Status:** ✅ **COMPLETED**
-
-**Implementation Summary:**
-- Added `archived` boolean field to Card resource with default: false
-- Added `archived_at` timestamp field to track when cards were archived
-- Created custom Ash action `:archive` that sets archived=true and archived_at=current_timestamp
-- Created custom Ash action `:unarchive` that sets archived=false, archived_at=nil, and moves to "new" list (list_id 1)
-- Updated queries: created `:active_cards` read action to exclude archived cards, `:archived_cards` to fetch only archived
-- Updated BoardLive.Index to use `:active_cards` action, so archived cards are hidden from main board
-- Generated and ran database migration for new fields with default values
-- Added comprehensive tests covering archive/unarchive functionality, query filtering, and default behaviors
-- All Card resource tests pass (14 tests, 0 failures)
-- All board LiveView tests pass (11 tests, 0 failures)
-
-**Prompt:**
-```
-Add archive functionality to the Card resource model in the Hot.Trakt domain. The changes needed are:
-
-1. Add an `archived` boolean field to the Card resource (default: false)
-2. Add an `archived_at` timestamp field to track when cards were archived
-3. Create a custom Ash action `:archive` that sets archived=true and archived_at=current_timestamp
-4. Create a custom Ash action `:unarchive` that sets archived=false and archived_at=nil
-5. Update the default queries to exclude archived cards from the main board view
-6. Create a separate query to fetch only archived cards for the archive page
-7. Generate and run the database migration for the new fields
-8. Update the Card resource tests to cover the new archive functionality
-
-Ensure archived cards are completely hidden from the main board but can be retrieved separately for the archive view.
-```
-
-## 3. Create Archive Page ✅ **COMPLETED**
-
-**Status:** ✅ **COMPLETED**
-
-**Implementation Summary:**
-- Created new LiveView at `lib/hot_web/archive_live/index.ex` that displays archived cards in a clean grid layout
-- Added `/archive` route in router with authentication protection via `:protected` pipeline
-- Designed responsive archive page layout showing archived cards with titles, descriptions, archive dates, and show information
-- Implemented unarchive functionality that moves cards back to the "new" list (list_id 1) on the main board
-- Added "Archive" navigation link in main app layout header with proper highlighting for current page
-- Used Tailwind CSS styling similar to main board but optimized for archive viewing
-- Added real-time updates via PubSub for `card_archived` and `card_unarchived` events
-- Included "Back to Board" navigation link for easy navigation
-- Written comprehensive tests covering all functionality: empty states, card display, unarchive actions, real-time updates, authentication, edge cases, and PubSub integration
-- All 16 archive-specific tests pass successfully
-- Archive page handles missing titles/descriptions gracefully and formats dates properly
-- Real-time updates work across multiple clients via Phoenix PubSub
-
-**Prompt:**
-```
-Create a dedicated archive page to display archived cards. This should include:
-
-1. Create a new LiveView at `lib/hot_web/archive_live/index.ex` that displays archived cards
-2. Add a route `/archive` in the router that requires authentication
-3. Design the archive page layout to show archived cards in a simple list or grid format
-4. Include the card title, description, archived date, and any associated show information
-5. Add functionality to unarchive cards (move them back to the "new" column on the main board)
-6. Add a navigation link in the main app layout/header to access the archive
-7. Use similar styling to the main board but optimized for viewing archived content
-8. Add real-time updates via PubSub when cards are archived/unarchived from the main board
-9. Include a "Back to Board" navigation link
-10. Write comprehensive tests for the archive LiveView functionality
-
-The archive should provide a clean, organized view of historical cards with easy restoration capabilities.
-```
-
-## 4. Add Archive Dropzone on Board Page ✅ **COMPLETED**
-
-**Status:** ✅ **COMPLETED**
-
-**Implementation Summary:**
-- Added visual archive dropzone in the lower right corner that appears only when dragging cards
-- Created responsive dropzone with archive icon, "Archive" text, and smooth CSS animations
-- Integrated with existing SortableJS system to handle drop events without interfering with list-to-list card movement
-- Added JavaScript hooks (ArchiveDropzone) that show/hide dropzone during drag operations
-- Implemented drag-over visual feedback with color and scale changes
-- Created LiveView event handler `archive_card` that uses Ash changeset pattern for archiving
-- Added real-time updates via PubSub broadcasting to both board and archive pages
-- Included accessibility features: keyboard shortcut (Shift+Delete), ARIA labels, screen reader support, and focus management
-- Added comprehensive test coverage (10 new tests) covering dropzone rendering, archive functionality, real-time updates, error handling, accessibility, and malformed parameter handling
-- All archive-related board tests pass (20 tests, 0 failures)
-- Archive dropzone provides smooth visual feedback with success animation and screen reader announcements
-
-**Prompt:**
-```
-Add an archive dropzone to the main board page that allows users to archive cards by dragging them. The implementation should include:
-
-1. Create a visual dropzone that appears in the lower right corner of the screen when a user starts dragging a card
-2. Style the dropzone with appropriate visual feedback (e.g., archive icon, "Archive" text, hover states)
-3. Integrate with the existing SortableJS drag-and-drop system to detect when cards are dropped on the archive zone
-4. Add JavaScript hooks to handle the archive dropzone interaction:
-   - Show dropzone only when dragging starts
-   - Hide dropzone when dragging ends
-   - Handle drop events on the archive zone
-5. Send a LiveView event to archive the card when dropped on the archive zone
-6. Provide visual feedback during the archive process (loading state, success animation)
-7. Update the board immediately after archiving (remove card from view)
-8. Broadcast the archive action via PubSub for real-time updates to other clients
-9. Ensure the dropzone doesn't interfere with existing list-to-list card movement
-10. Add accessibility features (keyboard shortcuts, screen reader support)
-11. Write tests to verify the archive dropzone functionality
-
-The dropzone should feel intuitive and provide clear visual feedback throughout the interaction.
-```
+This document contains the prompt plan for enhancing the existing archive functionality with split status handling and dual dropzones.
 
 ## Technical Considerations
 
@@ -133,3 +10,123 @@ The dropzone should feel intuitive and provide clear visual feedback throughout 
 - Follow the project's existing code conventions
 - Ensure all changes integrate with the current authentication system
 - Maintain the vendored SortableJS drag-and-drop implementation
+
+## 5. Split Archive Status into Finished and Cancelled
+
+**Status:** 📋 **PLANNED**
+
+**Implementation Plan:**
+- Modify Card resource to replace `archived` boolean with new hardcoded lists in board_lists.ex (names: "finished", "cancelled")  
+- Update archive/unarchive actions to handle the new lists
+- Migrate existing archived cards to use the new status system
+- Update queries to handle the new status field instead of archived boolean
+- Update seed data
+- Update archive page to separate finished and cancelled cards
+- Update tests to cover the new status-based system
+
+**Prompt:**
+```
+Change the archiving data model to split archived status into two distinct statuses: finished and cancelled. The changes needed are:
+
+1. Modify Card resource to replace `archived` boolean with new hardcoded lists in board_lists.ex (names: "finished", "cancelled")  
+2. Update the existing `:archive` action to accept a status parameter and move to the appropriate list
+3. Create separate actions `:mark_finished` and `:mark_cancelled` for clarity
+4. Update the `:unarchive` action to set status back to "active"
+5. Update all queries to use the new lists instead of the archived boolean
+6. Generate and run a database migration to convert existing archived=true cards to finished status
+7. Update Card resource tests to cover the new list-based functionality
+8. Ensure backward compatibility during the migration process
+
+The new status field should provide clearer semantics about why a card was removed from the active board.
+Ignore any breakage on the archive page for now.
+```
+
+## 6. Split Archive Dropzone into Finished and Cancelled Zones
+
+**Status:** 📋 **PLANNED**
+
+**Implementation Plan:**
+- Replace single archive dropzone with two separate dropzones
+- Position finished dropzone (green) at bottom right of screen
+- Position cancelled dropzone (red) at bottom left of screen
+- Update JavaScript hooks to handle both dropzones
+- Add appropriate visual styling and feedback for each zone
+
+**Prompt:**
+```
+Replace the single archive dropzone with two separate dropzones for finished and cancelled statuses. The implementation should include:
+
+1. Remove the existing single archive dropzone
+2. Create a "Finished" dropzone positioned at the bottom right of the screen with green styling
+3. Create a "Cancelled" dropzone positioned at the bottom left of the screen with red styling
+4. Update JavaScript hooks to handle both dropzones independently:
+   - Show both dropzones when dragging starts
+   - Provide distinct visual feedback for each zone
+   - Send different LiveView events for finished vs cancelled drops
+5. Ensure both dropzones are responsive and scale properly for mobile screens
+6. Use appropriate icons and text labels for each dropzone
+7. Update the LiveView event handlers to process finished and cancelled actions separately
+8. Maintain accessibility features for both dropzones
+9. Update tests to cover both dropzone interactions
+
+The dropzones should provide clear visual distinction between finishing and cancelling shows.
+```
+
+## 7. Update Archive Page with Finished and Cancelled Sections
+
+**Status:** 📋 **PLANNED**
+
+**Implementation Plan:**
+- Modify archive page to show finished shows at the top in a dedicated section
+- Add a separate section below for cancelled shows
+- Update styling to visually distinguish between the two sections
+- Maintain responsive design for mobile viewing
+- Update unarchive functionality to work with the new status system
+
+**Prompt:**
+```
+Update the Archive page to separate finished and cancelled shows into distinct sections. The changes needed are:
+
+1. Modify the archive LiveView to query and display finished shows in a top section
+2. Add a separate section below for cancelled shows
+3. Add clear section headers and visual styling to distinguish between finished and cancelled
+4. Use appropriate colors/styling: green accents for finished section, red accents for cancelled section
+5. Update the unarchive functionality to work with the new status-based system
+6. Maintain the existing grid layout within each section
+7. Ensure responsive design works well on mobile devices
+8. Update real-time PubSub handling for the new status-based events
+9. Add empty state messages for each section when no cards are present
+10. Update archive page tests to cover the new sectioned layout
+11. Ensure proper navigation and accessibility between sections
+
+The archive page should clearly separate and organize shows by their completion status.
+```
+
+## 8. Ensure Mobile Responsiveness for Dropzones
+
+**Status:** 📋 **PLANNED**
+
+**Implementation Plan:**
+- Test dropzones on various mobile screen sizes
+- Adjust positioning and sizing for small screens
+- Ensure touch interactions work properly
+- Optimize dropzone visibility without blocking content
+- Test with different mobile orientations
+
+**Prompt:**
+```
+Optimize the finished and cancelled dropzones for mobile screens and touch interactions. The implementation should include:
+
+1. Test and adjust dropzone positioning for mobile screen sizes (320px and up)
+2. Ensure dropzones are appropriately sized for touch interactions (minimum 44px touch targets)
+3. Optimize dropzone spacing to prevent accidental drops on small screens
+4. Adjust dropzone visibility and opacity to work well on mobile without blocking critical content
+5. Test touch drag and drop interactions on mobile devices
+6. Ensure dropzones work in both portrait and landscape orientations
+7. Add CSS media queries for different mobile breakpoints
+8. Test with various mobile browsers and devices
+9. Ensure accessibility features work well with mobile screen readers
+10. Update responsive design tests to cover mobile dropzone scenarios
+
+The dropzones should provide an excellent user experience on mobile devices while maintaining functionality.
+```
