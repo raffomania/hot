@@ -43,7 +43,7 @@ Ignore any breakage on the archive page for now.
 
 ## 6. Split Archive Dropzone into Finished and Cancelled Zones
 
-**Status:** 📋 **PLANNED**
+**Status:** ✅ **COMPLETED**
 
 **Implementation Plan:**
 - Replace single archive dropzone with two separate dropzones

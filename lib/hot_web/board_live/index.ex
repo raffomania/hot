@@ -9,11 +9,15 @@ defmodule HotWeb.BoardLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex justify-center px-4 py-8 space-x-1 overflow-x-auto" id="board-container">
+    <div
+      class="flex justify-center px-4 py-8 space-x-1 overflow-x-auto"
+      id="board-container"
+      phx-hook="BoardContainer"
+    >
+      <div id="keyboard-handler" phx-hook="DropzoneKeyboard" style="display: none;"></div>
       <div
         :for={{list_id, list_config} <- @lists}
         class="flex flex-col p-4 pb-10 rounded-md bg-neutral-100 min-w-72 max-w-72"
-        phx-hook="BoardList"
         id={"list-#{list_id}"}
         data-list-id={list_id}
       >
@@ -34,7 +38,7 @@ defmodule HotWeb.BoardLive.Index do
             id={"card-#{card.id}"}
             tabindex="0"
             role="button"
-            aria-label={"Card: #{card.title || "Untitled"} - Press Shift+Delete to archive"}
+            aria-label={"Card: #{card.title || "Untitled"} - Press Shift+F to finish, Shift+C to cancel, or Shift+Delete to archive"}
           >
             
     <!-- Card Title -->
@@ -112,37 +116,58 @@ defmodule HotWeb.BoardLive.Index do
       </div>
     </div>
 
-    <!-- Archive Dropzone -->
+    <!-- Finished Dropzone (Green, Bottom Right) -->
     <div
-      id="archive-dropzone"
-      class="fixed bottom-0 z-50 flex flex-col items-center justify-center w-48 h-48 transition-all duration-200 transform scale-75 -translate-y-1/2 border-4 border-red-400 border-dashed rounded-lg opacity-0 pointer-events-none right-6 bg-red-50"
-      phx-hook="ArchiveDropzone"
+      id="finished-dropzone"
+      class="fixed bottom-4 right-4 z-50 flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 transition-all duration-200 transform scale-75 border-4 border-green-400 border-dashed rounded-lg opacity-0 pointer-events-none bg-green-50"
+      phx-hook="FinishedDropzone"
       role="region"
-      aria-label="Archive dropzone - Drop cards here to archive them"
+      aria-label="Finished dropzone - Drop cards here to mark them as finished"
       aria-live="polite"
-      aria-describedby="archive-help-text"
+      aria-describedby="finished-help-text"
     >
       <svg
-        class="w-8 h-8 mb-2 text-red-600"
+        class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 mb-1 sm:mb-2 text-green-600"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
         aria-hidden="true"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-        >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
         </path>
       </svg>
-      <span class="text-sm font-medium text-red-600">Archive</span>
+      <span class="text-xs sm:text-sm font-medium text-green-600">Finished</span>
+    </div>
+
+    <!-- Cancelled Dropzone (Red, Bottom Left) -->
+    <div
+      id="cancelled-dropzone"
+      class="fixed bottom-4 left-4 z-50 flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 transition-all duration-200 transform scale-75 border-4 border-red-400 border-dashed rounded-lg opacity-0 pointer-events-none bg-red-50"
+      phx-hook="CancelledDropzone"
+      role="region"
+      aria-label="Cancelled dropzone - Drop cards here to mark them as cancelled"
+      aria-live="polite"
+      aria-describedby="cancelled-help-text"
+    >
+      <svg
+        class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 mb-1 sm:mb-2 text-red-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+        </path>
+      </svg>
+      <span class="text-xs sm:text-sm font-medium text-red-600">Cancelled</span>
     </div>
 
     <!-- Hidden help text for accessibility -->
-    <div id="archive-help-text" class="sr-only">
-      When dragging a card, drop it on the archive area to archive it. Use Shift+Delete keyboard shortcut to archive the currently focused card.
+    <div id="finished-help-text" class="sr-only">
+      When dragging a card, drop it on the finished area to mark it as finished. Use Shift+F keyboard shortcut to finish the currently focused card.
+    </div>
+    <div id="cancelled-help-text" class="sr-only">
+      When dragging a card, drop it on the cancelled area to mark it as cancelled. Use Shift+C keyboard shortcut to cancel the currently focused card.
     </div>
     """
   end
@@ -272,10 +297,10 @@ defmodule HotWeb.BoardLive.Index do
   end
 
   @impl true
-  def handle_event("archive_card", %{"card_id" => card_id}, socket)
+  def handle_event("finish_card", %{"card_id" => card_id}, socket)
       when is_binary(card_id) and card_id != "" do
     with {:ok, card} <- Ash.get(Card, card_id),
-         {:ok, archived_card} <-
+         {:ok, finished_card} <-
            card
            |> Ash.Changeset.for_update(:mark_finished)
            |> Ash.update() do
@@ -283,20 +308,67 @@ defmodule HotWeb.BoardLive.Index do
       Phoenix.PubSub.broadcast(
         Hot.PubSub,
         @board_topic,
-        {:board_updated, %{action: :card_archived, card: archived_card}}
+        {:board_updated, %{action: :card_finished, card: finished_card}}
       )
 
       # Also broadcast to archive page if it's open
       Phoenix.PubSub.broadcast(
         Hot.PubSub,
         "archive:updates",
-        {:card_archived, archived_card}
+        {:card_finished, finished_card}
       )
 
       {:noreply, load_board_data(socket)}
     else
       _ -> {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_event("finish_card", _params, socket) do
+    # Handle malformed parameters gracefully
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("cancel_card", %{"card_id" => card_id}, socket)
+      when is_binary(card_id) and card_id != "" do
+    with {:ok, card} <- Ash.get(Card, card_id),
+         {:ok, cancelled_card} <-
+           card
+           |> Ash.Changeset.for_update(:mark_cancelled)
+           |> Ash.update() do
+      # Broadcast to all connected clients
+      Phoenix.PubSub.broadcast(
+        Hot.PubSub,
+        @board_topic,
+        {:board_updated, %{action: :card_cancelled, card: cancelled_card}}
+      )
+
+      # Also broadcast to archive page if it's open
+      Phoenix.PubSub.broadcast(
+        Hot.PubSub,
+        "archive:updates",
+        {:card_cancelled, cancelled_card}
+      )
+
+      {:noreply, load_board_data(socket)}
+    else
+      _ -> {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("cancel_card", _params, socket) do
+    # Handle malformed parameters gracefully
+    {:noreply, socket}
+  end
+
+  # Legacy handler for backward compatibility
+  @impl true
+  def handle_event("archive_card", %{"card_id" => card_id}, socket)
+      when is_binary(card_id) and card_id != "" do
+    handle_event("finish_card", %{"card_id" => card_id}, socket)
   end
 
   @impl true

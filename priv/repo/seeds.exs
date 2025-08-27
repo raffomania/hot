@@ -114,10 +114,15 @@ archived_cards_data = [
 archived_cards =
   Enum.map(archived_cards_data, fn card_attrs ->
     card = Ash.create!(Card, card_attrs)
-    # Archive the card
+    # Archive the card - mix of finished and cancelled for variety
+    action =
+      if rem(card.list_id + String.length(card.title), 2) == 0,
+        do: :mark_finished,
+        else: :mark_cancelled
+
     archived_card =
       card
-      |> Ash.Changeset.for_update(:archive)
+      |> Ash.Changeset.for_update(action)
       |> Ash.update!()
 
     archived_card
