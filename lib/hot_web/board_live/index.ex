@@ -10,14 +10,14 @@ defmodule HotWeb.BoardLive.Index do
   def render(assigns) do
     ~H"""
     <div
-      class="flex justify-center px-4 py-8 space-x-1 overflow-x-auto"
+      class="flex flex-wrap justify-center gap-4 px-4 py-8"
       id="board-container"
       phx-hook="BoardContainer"
     >
       <div id="keyboard-handler" phx-hook="DropzoneKeyboard" style="display: none;"></div>
       <div
         :for={{list_id, list_config} <- @lists}
-        class="flex flex-col p-4 pb-10 rounded-md bg-neutral-100 min-w-72 max-w-72"
+        class="flex flex-col p-4 pb-10 rounded-md bg-neutral-100 w-72 max-w-96"
         id={"list-#{list_id}"}
         data-list-id={list_id}
       >
@@ -119,7 +119,7 @@ defmodule HotWeb.BoardLive.Index do
     <!-- Finished Dropzone (Green, Bottom Right) -->
     <div
       id="finished-dropzone"
-      class="fixed bottom-4 right-4 z-50 flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 transition-all duration-200 transform scale-75 border-4 border-green-400 border-dashed rounded-lg opacity-0 pointer-events-none bg-green-50"
+      class="fixed z-50 flex flex-col items-center justify-center w-32 h-32 transition-all duration-200 transform scale-75 border-4 border-green-400 border-dashed rounded-lg opacity-0 pointer-events-none bottom-4 right-4 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-green-50"
       phx-hook="FinishedDropzone"
       role="region"
       aria-label="Finished dropzone - Drop cards here to mark them as finished"
@@ -127,7 +127,7 @@ defmodule HotWeb.BoardLive.Index do
       aria-describedby="finished-help-text"
     >
       <svg
-        class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 mb-1 sm:mb-2 text-green-600"
+        class="w-6 h-6 mb-1 text-green-600 sm:w-7 sm:h-7 md:w-8 md:h-8 sm:mb-2"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -136,13 +136,13 @@ defmodule HotWeb.BoardLive.Index do
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
         </path>
       </svg>
-      <span class="text-xs sm:text-sm font-medium text-green-600">Finished</span>
+      <span class="text-xs font-medium text-green-600 sm:text-sm">Finish</span>
     </div>
 
     <!-- Cancelled Dropzone (Red, Bottom Left) -->
     <div
       id="cancelled-dropzone"
-      class="fixed bottom-4 left-4 z-50 flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 transition-all duration-200 transform scale-75 border-4 border-red-400 border-dashed rounded-lg opacity-0 pointer-events-none bg-red-50"
+      class="fixed z-50 flex flex-col items-center justify-center w-32 h-32 transition-all duration-200 transform scale-75 border-4 border-red-400 border-dashed rounded-lg opacity-0 pointer-events-none bottom-4 left-4 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-red-50"
       phx-hook="CancelledDropzone"
       role="region"
       aria-label="Cancelled dropzone - Drop cards here to mark them as cancelled"
@@ -150,7 +150,7 @@ defmodule HotWeb.BoardLive.Index do
       aria-describedby="cancelled-help-text"
     >
       <svg
-        class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 mb-1 sm:mb-2 text-red-600"
+        class="w-6 h-6 mb-1 text-red-600 sm:w-7 sm:h-7 md:w-8 md:h-8 sm:mb-2"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -159,7 +159,7 @@ defmodule HotWeb.BoardLive.Index do
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
         </path>
       </svg>
-      <span class="text-xs sm:text-sm font-medium text-red-600">Cancelled</span>
+      <span class="text-xs font-medium text-red-600 sm:text-sm">Cancel</span>
     </div>
 
     <!-- Hidden help text for accessibility -->
