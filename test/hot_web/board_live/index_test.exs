@@ -348,14 +348,16 @@ defmodule HotWeb.BoardLive.IndexTest do
       cards = Ash.read!(Card)
       card = Enum.find(cards, &(&1.title == "Test Card"))
       assert card != nil
-      assert card.archived == false
+      # Should be in active lists
+      assert card.list_id in [1, 2]
 
       # Archive the card using the archive_card event
       lv |> render_hook("archive_card", %{card_id: card.id})
 
       # Card should be archived and removed from the board
       updated_card = Ash.get!(Card, card.id)
-      assert updated_card.archived == true
+      # Should be in archived lists
+      assert updated_card.list_id in [3, 4]
       assert updated_card.archived_at != nil
 
       # Card should no longer appear on the board
@@ -372,7 +374,7 @@ defmodule HotWeb.BoardLive.IndexTest do
 
       {:ok, _archived_card} =
         card
-        |> Ash.Changeset.for_update(:archive)
+        |> Ash.Changeset.for_update(:mark_finished)
         |> Ash.update()
 
       # Load the board - archived card should not be visible
@@ -405,12 +407,14 @@ defmodule HotWeb.BoardLive.IndexTest do
       # Should receive board update broadcast
       assert_receive {:board_updated, %{action: :card_archived, card: archived_card}}, 1000
       assert archived_card.id == card.id
-      assert archived_card.archived == true
+      # Should be in archived lists
+      assert archived_card.list_id in [3, 4]
 
       # Should also receive archive page broadcast  
       assert_receive {:card_archived, archived_card}, 1000
       assert archived_card.id == card.id
-      assert archived_card.archived == true
+      # Should be in archived lists
+      assert archived_card.list_id in [3, 4]
     end
 
     test "multiple clients see archive updates in real-time", %{conn: conn} do

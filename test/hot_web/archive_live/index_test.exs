@@ -33,7 +33,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -60,10 +60,10 @@ defmodule HotWeb.ArchiveLive.IndexTest do
         })
 
       # Archive first card
-      {:ok, _} = Ash.update(card1, %{}, action: :archive)
+      {:ok, _} = Ash.update(card1, %{}, action: :mark_finished)
 
       # Archive second card (ordering might be same second due to timing)
-      {:ok, _} = Ash.update(card2, %{}, action: :archive)
+      {:ok, _} = Ash.update(card2, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -92,7 +92,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -109,7 +109,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -128,7 +128,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 2
         })
 
-      {:ok, archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, lv, _html} = live(conn, "/archive")
@@ -146,7 +146,6 @@ defmodule HotWeb.ArchiveLive.IndexTest do
 
       # Verify card was unarchived in database
       unarchived_card = Ash.get!(Card, archived_card.id)
-      assert unarchived_card.archived == false
       assert unarchived_card.archived_at == nil
       # Should be moved to "new" list
       assert unarchived_card.list_id == 1
@@ -170,7 +169,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           show_id: show.id
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -199,7 +198,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       # Broadcast the event that would come from the board
       Phoenix.PubSub.broadcast(
@@ -223,7 +222,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, lv, html} = live(conn, "/archive")
@@ -254,7 +253,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, lv, html} = live(conn, "/archive")
@@ -288,7 +287,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -306,8 +305,8 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      # Use direct SQL update since archived is not in the accepted attributes for update action
-      Hot.Repo.query!("UPDATE cards SET archived = true WHERE id = ?", [card.id])
+      # Use the mark_finished action instead of direct SQL
+      {:ok, _} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")
@@ -331,7 +330,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       # Broadcast archive event
       Phoenix.PubSub.broadcast(
@@ -356,7 +355,7 @@ defmodule HotWeb.ArchiveLive.IndexTest do
           list_id: 1
         })
 
-      {:ok, _archived_card} = Ash.update(card, %{}, action: :archive)
+      {:ok, _archived_card} = Ash.update(card, %{}, action: :mark_finished)
 
       conn = authenticate_conn(conn)
       {:ok, _lv, html} = live(conn, "/archive")

@@ -110,63 +110,141 @@ defmodule Hot.Trakt.CardTest do
     end
   end
 
-  describe "archive functionality" do
-    test "cards are created with archived=false by default" do
+  describe "list-based archive functionality" do
+    test "cards are created with archived_at=nil by default" do
       assert {:ok, card} =
                Ash.create(Card, %{title: "Test Card", list_id: 1})
 
-      assert card.archived == false
       assert card.archived_at == nil
     end
 
-    test "can archive a card" do
+    test "can mark card as finished" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Finish", list_id: 1})
+
+      assert {:ok, finished_card} =
+               card
+               |> Ash.Changeset.for_update(:mark_finished)
+               |> Ash.update()
+
+      assert finished_card.list_id == 3
+      assert finished_card.archived_at != nil
+    end
+
+    test "can mark card as cancelled" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Cancel", list_id: 1})
+
+      assert {:ok, cancelled_card} =
+               card
+               |> Ash.Changeset.for_update(:mark_cancelled)
+               |> Ash.update()
+
+      assert cancelled_card.list_id == 4
+      assert cancelled_card.archived_at != nil
+    end
+
+    test "can archive a card with finished status" do
       assert {:ok, card} =
                Ash.create(Card, %{title: "To Archive", list_id: 1})
 
       assert {:ok, archived_card} =
                card
-               |> Ash.Changeset.for_update(:archive)
+               |> Ash.Changeset.for_update(:archive, %{status: "finished"})
                |> Ash.update()
 
-      assert archived_card.archived == true
+      assert archived_card.list_id == 3
       assert archived_card.archived_at != nil
-      assert archived_card.list_id == card.list_id
     end
 
-    test "can unarchive a card" do
+    test "can archive a card with cancelled status" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Archive", list_id: 1})
+
+      assert {:ok, archived_card} =
+               card
+               |> Ash.Changeset.for_update(:archive, %{status: "cancelled"})
+               |> Ash.update()
+
+      assert archived_card.list_id == 4
+      assert archived_card.archived_at != nil
+    end
+
+    test "archive action validates status parameter" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Archive", list_id: 1})
+
+      assert {:error, error} =
+               card
+               |> Ash.Changeset.for_update(:archive, %{status: "invalid"})
+               |> Ash.update()
+
+      assert error.errors
+             |> Enum.any?(fn e -> String.contains?(to_string(e.message), "finished") end)
+    end
+
+    test "can unarchive a finished card" do
       assert {:ok, card} =
                Ash.create(Card, %{title: "To Unarchive", list_id: 2})
 
-      # First archive it
-      assert {:ok, archived_card} =
+      # First finish it
+      assert {:ok, finished_card} =
                card
-               |> Ash.Changeset.for_update(:archive)
+               |> Ash.Changeset.for_update(:mark_finished)
                |> Ash.update()
 
       # Then unarchive it
       assert {:ok, unarchived_card} =
-               archived_card
+               finished_card
                |> Ash.Changeset.for_update(:unarchive)
                |> Ash.update()
 
-      assert unarchived_card.archived == false
       assert unarchived_card.archived_at == nil
       # Should move to "new" list (list_id 1)
       assert unarchived_card.list_id == 1
     end
 
-    test "active_cards query excludes archived cards" do
+    test "can unarchive a cancelled card" do
+      assert {:ok, card} =
+               Ash.create(Card, %{title: "To Unarchive", list_id: 2})
+
+      # First cancel it
+      assert {:ok, cancelled_card} =
+               card
+               |> Ash.Changeset.for_update(:mark_cancelled)
+               |> Ash.update()
+
+      # Then unarchive it
+      assert {:ok, unarchived_card} =
+               cancelled_card
+               |> Ash.Changeset.for_update(:unarchive)
+               |> Ash.update()
+
+      assert unarchived_card.archived_at == nil
+      # Should move to "new" list (list_id 1)
+      assert unarchived_card.list_id == 1
+    end
+
+    test "active_cards query excludes finished and cancelled cards" do
       # Create some cards
       assert {:ok, card1} =
                Ash.create(Card, %{title: "Active Card", list_id: 1})
 
       assert {:ok, card2} =
-               Ash.create(Card, %{title: "To Archive", list_id: 1})
+               Ash.create(Card, %{title: "To Finish", list_id: 1})
 
-      # Archive one card
-      assert {:ok, _archived_card} =
+      assert {:ok, card3} =
+               Ash.create(Card, %{title: "To Cancel", list_id: 2})
+
+      # Finish and cancel some cards
+      assert {:ok, _finished_card} =
                card2
-               |> Ash.Changeset.for_update(:archive)
+               |> Ash.Changeset.for_update(:mark_finished)
+               |> Ash.update()
+
+      assert {:ok, _cancelled_card} =
+               card3
+               |> Ash.Changeset.for_update(:mark_cancelled)
                |> Ash.update()
 
       # Query active cards
@@ -176,25 +254,93 @@ defmodule Hot.Trakt.CardTest do
       assert Enum.at(active_cards, 0).id == card1.id
     end
 
-    test "archived_cards query returns only archived cards" do
+    test "finished_cards query returns only finished cards" do
       # Create some cards
       assert {:ok, _card1} =
                Ash.create(Card, %{title: "Active Card", list_id: 1})
 
       assert {:ok, card2} =
-               Ash.create(Card, %{title: "To Archive", list_id: 1})
+               Ash.create(Card, %{title: "To Finish", list_id: 1})
 
-      # Archive one card
-      assert {:ok, archived_card} =
+      assert {:ok, card3} =
+               Ash.create(Card, %{title: "To Cancel", list_id: 1})
+
+      # Finish one and cancel another
+      assert {:ok, finished_card} =
                card2
-               |> Ash.Changeset.for_update(:archive)
+               |> Ash.Changeset.for_update(:mark_finished)
+               |> Ash.update()
+
+      assert {:ok, _cancelled_card} =
+               card3
+               |> Ash.Changeset.for_update(:mark_cancelled)
+               |> Ash.update()
+
+      # Query finished cards
+      finished_cards = Ash.read!(Card, action: :finished_cards)
+
+      assert length(finished_cards) == 1
+      assert Enum.at(finished_cards, 0).id == finished_card.id
+    end
+
+    test "cancelled_cards query returns only cancelled cards" do
+      # Create some cards
+      assert {:ok, _card1} =
+               Ash.create(Card, %{title: "Active Card", list_id: 1})
+
+      assert {:ok, card2} =
+               Ash.create(Card, %{title: "To Finish", list_id: 1})
+
+      assert {:ok, card3} =
+               Ash.create(Card, %{title: "To Cancel", list_id: 1})
+
+      # Finish one and cancel another
+      assert {:ok, _finished_card} =
+               card2
+               |> Ash.Changeset.for_update(:mark_finished)
+               |> Ash.update()
+
+      assert {:ok, cancelled_card} =
+               card3
+               |> Ash.Changeset.for_update(:mark_cancelled)
+               |> Ash.update()
+
+      # Query cancelled cards
+      cancelled_cards = Ash.read!(Card, action: :cancelled_cards)
+
+      assert length(cancelled_cards) == 1
+      assert Enum.at(cancelled_cards, 0).id == cancelled_card.id
+    end
+
+    test "archived_cards query returns finished and cancelled cards" do
+      # Create some cards
+      assert {:ok, _card1} =
+               Ash.create(Card, %{title: "Active Card", list_id: 1})
+
+      assert {:ok, card2} =
+               Ash.create(Card, %{title: "To Finish", list_id: 1})
+
+      assert {:ok, card3} =
+               Ash.create(Card, %{title: "To Cancel", list_id: 1})
+
+      # Finish one and cancel another
+      assert {:ok, finished_card} =
+               card2
+               |> Ash.Changeset.for_update(:mark_finished)
+               |> Ash.update()
+
+      assert {:ok, cancelled_card} =
+               card3
+               |> Ash.Changeset.for_update(:mark_cancelled)
                |> Ash.update()
 
       # Query archived cards
       archived_cards = Ash.read!(Card, action: :archived_cards)
 
-      assert length(archived_cards) == 1
-      assert Enum.at(archived_cards, 0).id == archived_card.id
+      assert length(archived_cards) == 2
+      card_ids = Enum.map(archived_cards, & &1.id)
+      assert finished_card.id in card_ids
+      assert cancelled_card.id in card_ids
     end
 
     test "primary read action returns all cards including archived" do
@@ -203,12 +349,12 @@ defmodule Hot.Trakt.CardTest do
                Ash.create(Card, %{title: "Active Card", list_id: 1})
 
       assert {:ok, card2} =
-               Ash.create(Card, %{title: "To Archive", list_id: 1})
+               Ash.create(Card, %{title: "To Finish", list_id: 1})
 
-      # Archive one card
-      assert {:ok, _archived_card} =
+      # Finish one card
+      assert {:ok, _finished_card} =
                card2
-               |> Ash.Changeset.for_update(:archive)
+               |> Ash.Changeset.for_update(:mark_finished)
                |> Ash.update()
 
       # Query all cards using primary read action
@@ -217,32 +363,32 @@ defmodule Hot.Trakt.CardTest do
       assert length(all_cards) == 2
     end
 
-    test "archived cards do not affect position calculations for active cards" do
+    test "finished and cancelled cards do not affect position calculations for active cards" do
       # Create 3 cards in the same list
       assert {:ok, _card1} =
-               Ash.create(Card, %{title: "First", list_id: 5})
+               Ash.create(Card, %{title: "First", list_id: 1})
 
       assert {:ok, card2} =
-               Ash.create(Card, %{title: "Second", list_id: 5})
+               Ash.create(Card, %{title: "Second", list_id: 1})
 
       assert {:ok, card3} =
-               Ash.create(Card, %{title: "Third", list_id: 5})
+               Ash.create(Card, %{title: "Third", list_id: 1})
 
-      # Archive the middle card
-      assert {:ok, _archived_card} =
+      # Finish the middle card
+      assert {:ok, _finished_card} =
                card2
-               |> Ash.Changeset.for_update(:archive)
+               |> Ash.Changeset.for_update(:mark_finished)
                |> Ash.update()
 
-      # Create a new card - it should get positioned correctly, ignoring the archived card
+      # Create a new card in the active lists - it should get positioned correctly
       assert {:ok, _new_card} =
-               Ash.create(Card, %{title: "New Card", list_id: 5})
+               Ash.create(Card, %{title: "New Card", list_id: 1})
 
       # Get all active cards in order
       active_cards =
         Card
         |> Ash.Query.for_read(:active_cards)
-        |> Ash.Query.filter(list_id == 5)
+        |> Ash.Query.filter(list_id == 1)
         |> Ash.Query.sort(position: :asc)
         |> Ash.read!()
 
@@ -257,11 +403,11 @@ defmodule Hot.Trakt.CardTest do
       assert Enum.at(active_cards, 2).title == "New Card"
       assert Enum.at(active_cards, 2).position == 40.0
 
-      # Now test moving a card - it should ignore archived cards in position calculations
+      # Now test moving a card - it should ignore finished cards in position calculations
       assert {:ok, moved_card} =
                card3
                |> Ash.Changeset.for_update(:move_to_position, %{
-                 new_list_id: 5,
+                 new_list_id: 1,
                  # Move to beginning
                  target_index: 0
                })

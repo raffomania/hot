@@ -8,7 +8,9 @@ defmodule Hot.Trakt.BoardLists do
 
   @default_lists %{
     1 => %{title: "new", position: 0},
-    2 => %{title: "watching", position: 1}
+    2 => %{title: "watching", position: 1},
+    3 => %{title: "finished", position: 2},
+    4 => %{title: "cancelled", position: 3}
   }
 
   @doc """
@@ -35,6 +37,16 @@ defmodule Hot.Trakt.BoardLists do
     get_config()
     |> Enum.sort_by(fn {_id, config} -> config.position end)
     |> Enum.map(fn {id, _config} -> id end)
+  end
+
+  @doc """
+  Gets only the active lists (for board display).
+  Returns lists with IDs 1 and 2 ("new" and "watching").
+  """
+  def get_active_lists() do
+    get_config()
+    |> Enum.filter(fn {id, _config} -> id in [1, 2] end)
+    |> Enum.sort_by(fn {_id, config} -> config.position end)
   end
 
   @doc """

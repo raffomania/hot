@@ -277,7 +277,7 @@ defmodule HotWeb.BoardLive.Index do
     with {:ok, card} <- Ash.get(Card, card_id),
          {:ok, archived_card} <-
            card
-           |> Ash.Changeset.for_update(:archive)
+           |> Ash.Changeset.for_update(:mark_finished)
            |> Ash.update() do
       # Broadcast to all connected clients
       Phoenix.PubSub.broadcast(
@@ -312,7 +312,7 @@ defmodule HotWeb.BoardLive.Index do
   end
 
   defp load_board_data(socket) do
-    lists = BoardLists.get_all_lists()
+    lists = BoardLists.get_active_lists()
 
     cards =
       Card

@@ -18,11 +18,19 @@ defmodule Hot.Trakt.Card do
     end
 
     read :active_cards do
-      filter expr(archived == false)
+      filter expr(list_id in [1, 2])
+    end
+
+    read :finished_cards do
+      filter expr(list_id == 3)
+    end
+
+    read :cancelled_cards do
+      filter expr(list_id == 4)
     end
 
     read :archived_cards do
-      filter expr(archived == true)
+      filter expr(list_id in [3, 4])
     end
 
     create :create do
@@ -58,12 +66,50 @@ defmodule Hot.Trakt.Card do
       change Hot.Trakt.Changes.RebalancePositions
     end
 
-    # Archive a card
+    # Archive a card with status - updated to use list-based system
     update :archive do
       accept []
       require_atomic? false
 
-      change set_attribute(:archived, true)
+      argument :status, :string, allow_nil?: false
+
+      change fn changeset, _context ->
+        status = Ash.Changeset.get_argument(changeset, :status)
+
+        unless status in ["finished", "cancelled"] do
+          Ash.Changeset.add_error(changeset,
+            field: :status,
+            message: "must be either 'finished' or 'cancelled'"
+          )
+        else
+          list_id =
+            case status do
+              "finished" -> 3
+              "cancelled" -> 4
+            end
+
+          changeset
+          |> Ash.Changeset.change_attribute(:list_id, list_id)
+          |> Ash.Changeset.change_attribute(:archived_at, DateTime.utc_now())
+        end
+      end
+    end
+
+    # Mark card as finished
+    update :mark_finished do
+      accept []
+      require_atomic? false
+
+      change set_attribute(:list_id, 3)
+      change set_attribute(:archived_at, &DateTime.utc_now/0)
+    end
+
+    # Mark card as cancelled
+    update :mark_cancelled do
+      accept []
+      require_atomic? false
+
+      change set_attribute(:list_id, 4)
       change set_attribute(:archived_at, &DateTime.utc_now/0)
     end
 
@@ -72,7 +118,6 @@ defmodule Hot.Trakt.Card do
       accept []
       require_atomic? false
 
-      change set_attribute(:archived, false)
       change set_attribute(:archived_at, nil)
       change set_attribute(:list_id, 1)
       change Hot.Trakt.Changes.AssignPosition
@@ -96,11 +141,6 @@ defmodule Hot.Trakt.Card do
 
     attribute :list_id, :integer do
       allow_nil? false
-    end
-
-    attribute :archived, :boolean do
-      allow_nil? false
-      default false
     end
 
     attribute :archived_at, :utc_datetime do

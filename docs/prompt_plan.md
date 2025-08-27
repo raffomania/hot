@@ -13,7 +13,7 @@ This document contains the prompt plan for enhancing the existing archive functi
 
 ## 5. Split Archive Status into Finished and Cancelled
 
-**Status:** 📋 **PLANNED**
+**Status:** ✅ **COMPLETED**
 
 **Implementation Plan:**
 - Modify Card resource to replace `archived` boolean with new hardcoded lists in board_lists.ex (names: "finished", "cancelled")  
