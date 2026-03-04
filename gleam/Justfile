@@ -1,0 +1,21 @@
+set export := true
+
+# Start the development server on port 4001
+run:
+    gleam run
+
+# Run the test suite
+test:
+    gleam test
+
+# Build the project
+build:
+    gleam build
+
+# Check formatting
+format:
+    gleam format
+
+# Remove build artifacts
+clean:
+    gleam clean
