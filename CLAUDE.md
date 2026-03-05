@@ -70,7 +70,7 @@ The primary interface is a Kanban board (Phoenix LiveView) with two active lists
 Hot is being incrementally ported to Gleam. Both projects coexist: Elixir on port 4000, Gleam on port 4001.
 
 **Plan**: `docs/gleam-port.md` (10 phases)
-**Current status**: Phase 0 complete (scaffolding). Phase 1 next: Database Schema + Card CRUD.
+**Current status**: Phases 0-4 complete (scaffolding, DB/CRUD, board page, card editing, drag-and-drop). Phase 5 next: Authentication.
 
 ### Gleam Stack
 - Web: Wisp + Mist

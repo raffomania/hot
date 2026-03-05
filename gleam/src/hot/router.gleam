@@ -18,6 +18,8 @@ pub fn handle_request(request: Request, context: Context) -> Response {
       board.finish_card(context.db, id)
     ["board", "cards", id, "cancel"], http.Post ->
       board.cancel_card(context.db, id)
+    ["board", "cards", id, "move"], http.Post ->
+      board.move_card(context.db, request, id)
     _, _ -> wisp.not_found()
   }
 }

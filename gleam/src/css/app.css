@@ -1,2 +1,25 @@
 @import "tailwindcss";
 @source "../";
+
+.sortable-ghost > * {
+  opacity: 0;
+}
+
+.sortable-ghost {
+  background-color: #f0f0f0;
+}
+
+#finished-dropzone,
+#cancelled-dropzone {
+  position: fixed;
+  overflow: hidden;
+}
+
+#finished-dropzone .sortable-ghost,
+#cancelled-dropzone .sortable-ghost {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  background-color: #d0d0d0;
+}
+

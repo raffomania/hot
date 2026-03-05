@@ -26,6 +26,7 @@ pub fn root_layout(
     html.body([class("bg-white")], [
       app_layout(current_page, content),
       html.script([src("/static/js/vendor/htmx.min.js")], ""),
+      html.script([src("/static/js/vendor/sortable.min.js")], ""),
       html.script([src("/static/js/app.js")], ""),
     ]),
   ])
