@@ -1,7 +1,8 @@
+import sqlight.{type Connection}
 import wisp.{type Request, type Response}
 
 pub type Context {
-  Context(static_directory: String)
+  Context(static_directory: String, db: Connection)
 }
 
 pub fn middleware(

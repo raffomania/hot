@@ -1,6 +1,7 @@
 import gleam/erlang/process
 import gleam/int
 import gleam/io
+import hot/database
 import hot/router
 import hot/web
 import mist
@@ -9,11 +10,16 @@ import wisp/wisp_mist
 
 const port = 4001
 
+const db_path = "hot_gleam_dev.db"
+
 pub fn main() {
   wisp.configure_logger()
   let secret_key_base = wisp.random_string(64)
 
-  let context = web.Context(static_directory: static_directory())
+  let assert Ok(db) = database.connect(db_path)
+  let assert Ok(_) = database.migrate(db)
+
+  let context = web.Context(static_directory: static_directory(), db: db)
   let handler = router.handle_request(_, context)
 
   let assert Ok(_) =

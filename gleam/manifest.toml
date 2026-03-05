@@ -32,6 +32,7 @@ packages = [
 ]
 
 [requirements]
+gleam_crypto = { version = ">= 1.5.0 and < 2.0.0" }
 gleam_erlang = { version = ">= 1.0.0 and < 2.0.0" }
 gleam_http = { version = ">= 3.7.0 and < 5.0.0" }
 gleam_httpc = { version = ">= 5.0.0 and < 6.0.0" }
