@@ -2,14 +2,17 @@ set export := true
 
 # Start the development server on port 4001
 run:
+    fd -t symlink . build -x rm
     gleam run
 
 # Run the test suite
 test:
+    fd -t symlink . build -x rm
     gleam test
 
 # Build the project
 build:
+    fd -t symlink . build -x rm
     gleam build
 
 # Check formatting
