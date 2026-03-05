@@ -64,3 +64,27 @@ The primary interface is a Kanban board (Phoenix LiveView) with two active lists
 - docs/design.md - Design guide for minimalistic UI approach
 - docs/board.md - Kanban board technical documentation
 - docs/prompt_plan.md - Planned prompts / implementation tasks
+
+## Gleam Port
+
+Hot is being incrementally ported to Gleam. Both projects coexist: Elixir on port 4000, Gleam on port 4001.
+
+**Plan**: `docs/gleam-port.md` (10 phases)
+**Current status**: Phase 0 complete (scaffolding). Phase 1 next: Database Schema + Card CRUD.
+
+### Gleam Stack
+- Web: Wisp + Mist
+- Database: sqlight (direct SQL, separate `gleam/hot_gleam_dev.db`)
+- HTML: Lustre HTML builder
+- Interactivity: HTMX
+- Real-time: Mist SSE + gleam_otp actor
+- Background tasks: gleam_otp actor
+- Styling: Tailwind standalone CLI
+
+### Gleam Development Commands
+All Gleam commands run from `gleam/` subdirectory:
+- `cd gleam && just run` - Start Gleam server on port 4001
+- `cd gleam && just test` - Run Gleam test suite
+- `cd gleam && just build` - Build Gleam project
+- `cd gleam && just format` - Format Gleam code
+- `cd gleam && just clean` - Remove build artifacts
