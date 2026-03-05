@@ -16,22 +16,14 @@ pub fn main() {
     #("House of the Dragon Season 3", Some("Upcoming season looks epic!"), 1),
     #("The Last of Us Part II", Some("Check out the new trailer"), 1),
     #("Dune: Part Three", Some("Paul's journey continues"), 1),
-    #(
-      "Firefly Reboot",
-      Some("Maybe this time it won't get cancelled"),
-      1,
-    ),
+    #("Firefly Reboot", Some("Maybe this time it won't get cancelled"), 1),
     // Watching list (list_id: 2)
     #("Stranger Things", Some("Season 4 finale was incredible"), 2),
     #("The Mandalorian", Some("Baby Yoda is the best"), 2),
     #("Wednesday", Some("Addams family spinoff"), 2),
     #("Breaking Bad", Some("Perfect ending to a perfect show"), 2),
     #("The Office", Some("That's what she said!"), 2),
-    #(
-      "Avatar: The Last Airbender",
-      Some("Masterpiece of animation"),
-      2,
-    ),
+    #("Avatar: The Last Airbender", Some("Masterpiece of animation"), 2),
   ]
 
   let archived_cards = [

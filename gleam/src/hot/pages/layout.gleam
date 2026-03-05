@@ -1,4 +1,4 @@
-import lustre/attribute.{class, href, rel}
+import lustre/attribute.{class, href, rel, src}
 import lustre/element.{type Element}
 import lustre/element/html
 
@@ -23,7 +23,11 @@ pub fn root_layout(
       html.title([], page_title <> " · Hot"),
       html.link([rel("stylesheet"), href("/static/css/app.css")]),
     ]),
-    html.body([class("bg-white")], [app_layout(current_page, content)]),
+    html.body([class("bg-white")], [
+      app_layout(current_page, content),
+      html.script([src("/static/js/vendor/htmx.min.js")], ""),
+      html.script([src("/static/js/app.js")], ""),
+    ]),
   ])
 }
 
