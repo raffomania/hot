@@ -167,7 +167,10 @@ pub fn delete(conn: Connection, id: String) -> Result(Bool, Error) {
   })
 }
 
-pub fn mark_finished(conn: Connection, id: String) -> Result(Option(Card), Error) {
+pub fn mark_finished(
+  conn: Connection,
+  id: String,
+) -> Result(Option(Card), Error) {
   let now = database.current_timestamp()
   sqlight.query(
     "UPDATE cards SET list_id = 3, archived_at = ?1, updated_at = ?1

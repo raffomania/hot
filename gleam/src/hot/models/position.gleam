@@ -53,7 +53,12 @@ pub fn calculate_move_position(
           case current_gap <. min_gap {
             True -> {
               use _ <- result.try(rebalance_list(conn, list_id))
-              calculate_move_position(conn, list_id, target_index, exclude_card_id)
+              calculate_move_position(
+                conn,
+                list_id,
+                target_index,
+                exclude_card_id,
+              )
             }
             False -> Ok(new_pos)
           }

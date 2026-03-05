@@ -37,8 +37,7 @@ pub fn move_to_beginning_test() {
   let assert Ok(c1) = card.create(conn, "Existing", None, 1)
   // Create a card in list 2, then move it to beginning of list 1
   let assert Ok(c2) = card.create(conn, "Mover", None, 2)
-  let assert Ok(pos) =
-    position.calculate_move_position(conn, 1, 0, c2.id)
+  let assert Ok(pos) = position.calculate_move_position(conn, 1, 0, c2.id)
   // Should be half of first card's position
   should.equal(pos, c1.position /. 2.0)
 }
@@ -47,8 +46,7 @@ pub fn move_to_end_test() {
   let conn = setup()
   let assert Ok(c1) = card.create(conn, "First", None, 1)
   let assert Ok(c2) = card.create(conn, "Mover", None, 2)
-  let assert Ok(pos) =
-    position.calculate_move_position(conn, 1, 1, c2.id)
+  let assert Ok(pos) = position.calculate_move_position(conn, 1, 1, c2.id)
   // Should be last + gap
   should.equal(pos, c1.position +. position.gap)
 }
@@ -58,8 +56,7 @@ pub fn move_to_middle_test() {
   let assert Ok(c1) = card.create(conn, "First", None, 1)
   let assert Ok(c2) = card.create(conn, "Second", None, 1)
   let assert Ok(c3) = card.create(conn, "Mover", None, 2)
-  let assert Ok(pos) =
-    position.calculate_move_position(conn, 1, 1, c3.id)
+  let assert Ok(pos) = position.calculate_move_position(conn, 1, 1, c3.id)
   // Should be midpoint between c1 and c2
   should.equal(pos, { c1.position +. c2.position } /. 2.0)
 }
@@ -67,8 +64,7 @@ pub fn move_to_middle_test() {
 pub fn move_to_empty_list_test() {
   let conn = setup()
   let assert Ok(c1) = card.create(conn, "Mover", None, 2)
-  let assert Ok(pos) =
-    position.calculate_move_position(conn, 1, 0, c1.id)
+  let assert Ok(pos) = position.calculate_move_position(conn, 1, 0, c1.id)
   should.equal(pos, position.gap)
 }
 

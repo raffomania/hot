@@ -1,19 +1,29 @@
 set export := true
 
+# Remove symlinks that cause compilation errors
+[private]
+clean-symlinks:
+    find build -type l -delete 2>/dev/null || true
+
+# Build Tailwind CSS
+css:
+    gleam run -m tailwind/run
+
 # Start the development server on port 4001
-run:
-    fd -t symlink . build -x rm
+run: clean-symlinks css
     gleam run
 
 # Run the test suite
-test:
-    fd -t symlink . build -x rm
+test: clean-symlinks
     gleam test
 
 # Build the project
-build:
-    fd -t symlink . build -x rm
+build: clean-symlinks
     gleam build
+
+# Populate database with seed data
+seed-db: clean-symlinks
+    gleam run -m hot/seed
 
 # Check formatting
 format:
