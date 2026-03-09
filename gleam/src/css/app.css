@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @source "../";
 
-.sortable-ghost > * {
+.sortable-ghost>* {
   opacity: 0;
 }
 
@@ -20,6 +20,12 @@
   position: absolute;
   inset: 0;
   opacity: 0.4;
-  background-color: #d0d0d0;
 }
 
+#finished-dropzone .sortable-ghost {
+  background-color: var(--color-green-400);
+}
+
+#cancelled-dropzone .sortable-ghost {
+  background-color: var(--color-red-400);
+}

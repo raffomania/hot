@@ -16,7 +16,7 @@ pub fn card_component(card: Card) -> Element(Nil) {
   html.div(
     [
       id(card_id),
-      class("p-4 bg-white border rounded-md border-neutral-200"),
+      class("p-4 bg-white border rounded-md border-neutral-300"),
       attribute("data-card-id", card.id),
       attribute("tabindex", "0"),
       attribute("role", "button"),
@@ -38,7 +38,6 @@ pub fn card_component(card: Card) -> Element(Nil) {
         ),
       ],
       description_display(card),
-      [action_buttons(card)],
     ]),
   )
 }

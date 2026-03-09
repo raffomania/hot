@@ -21,7 +21,6 @@
     --color-blue-300: oklch(0.809 0.105 251.813);
     --color-blue-600: oklch(0.546 0.245 262.881);
     --color-neutral-100: oklch(0.97 0 0);
-    --color-neutral-200: oklch(0.922 0 0);
     --color-neutral-300: oklch(0.87 0 0);
     --color-neutral-400: oklch(0.708 0 0);
     --color-neutral-500: oklch(0.556 0 0);
@@ -406,9 +405,6 @@
   .border-green-700 {
     border-color: var(--color-green-700);
   }
-  .border-neutral-200 {
-    border-color: var(--color-neutral-200);
-  }
   .border-neutral-300 {
     border-color: var(--color-neutral-300);
   }
@@ -663,7 +659,7 @@
     }
   }
 }
-.sortable-ghost > * {
+.sortable-ghost>* {
   opacity: 0;
 }
 .sortable-ghost {
@@ -677,7 +673,12 @@
   position: absolute;
   inset: 0;
   opacity: 0.4;
-  background-color: #d0d0d0;
+}
+#finished-dropzone .sortable-ghost {
+  background-color: var(--color-green-400);
+}
+#cancelled-dropzone .sortable-ghost {
+  background-color: var(--color-red-400);
 }
 @property --tw-scale-x {
   syntax: "*";

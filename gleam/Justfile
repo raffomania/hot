@@ -1,3 +1,5 @@
+set dotenv-load
+set dotenv-path := "../.env"
 set export := true
 
 # Remove symlinks that cause compilation errors

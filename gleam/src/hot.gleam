@@ -17,17 +17,8 @@ const db_path = "hot_gleam_dev.db"
 pub fn main() {
   wisp.configure_logger()
 
-  case config.shared_password() {
-    Error(_) -> {
-      io.println_error(
-        "Error: SHARED_PASSWORD environment variable is not set. Exiting.",
-      )
-      halt(1)
-    }
-    Ok(_) -> Nil
-  }
-
-  let secret_key_base = wisp.random_string(64)
+  require_env("SHARED_PASSWORD", config.shared_password())
+  let secret_key_base = require_env("SECRET_KEY_BASE", config.secret_key_base())
 
   let assert Ok(db) = database.connect(db_path)
   let assert Ok(_) = database.migrate(db)
@@ -56,5 +47,17 @@ fn static_directory() -> String {
   priv <> "/static"
 }
 
+fn require_env(name: String, value: Result(String, Nil)) -> String {
+  case value {
+    Ok(v) -> v
+    Error(_) -> {
+      io.println_error(
+        "Error: " <> name <> " environment variable is not set. Exiting.",
+      )
+      halt(1)
+    }
+  }
+}
+
 @external(erlang, "erlang", "halt")
-fn halt(status: Int) -> Nil
+fn halt(status: Int) -> a
