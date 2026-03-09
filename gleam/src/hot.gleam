@@ -6,6 +6,7 @@ import hot/database
 import hot/router
 import hot/web
 import mist
+import radiate
 import wisp
 import wisp/wisp_mist
 
@@ -40,6 +41,11 @@ pub fn main() {
     |> mist.new
     |> mist.port(port)
     |> mist.start
+
+  let _ =
+    radiate.new()
+    |> radiate.add_dir("src")
+    |> radiate.start()
 
   io.println("Hot (Gleam) running on http://localhost:" <> int.to_string(port))
   process.sleep_forever()
