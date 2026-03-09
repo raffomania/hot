@@ -67,7 +67,7 @@ pub fn board_page(db: Connection, request: Request) -> Response {
       wisp.ok()
       |> wisp.html_body(element.to_string(board_content))
     False -> {
-      let page = root_layout("Board", Board, [board_content])
+      let page = root_layout("Board", Board, True, [board_content])
       wisp.ok()
       |> wisp.html_body(element.to_document_string(page))
     }
@@ -184,9 +184,7 @@ fn list_column(
   let lid = int.to_string(list_id)
   html.div(
     [
-      class(
-        "flex flex-col p-4 pb-10 rounded-md bg-neutral-100 w-72 max-w-96",
-      ),
+      class("flex flex-col p-4 pb-10 rounded-md bg-neutral-100 w-72 max-w-96"),
       attribute("data-list-id", lid),
     ],
     [

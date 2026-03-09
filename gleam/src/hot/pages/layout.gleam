@@ -1,4 +1,4 @@
-import lustre/attribute.{class, href, rel, src}
+import lustre/attribute.{class, href, rel, src, type_}
 import lustre/element.{type Element}
 import lustre/element/html
 
@@ -11,6 +11,7 @@ pub type Page {
 pub fn root_layout(
   page_title: String,
   current_page: Page,
+  authenticated: Bool,
   content: List(Element(Nil)),
 ) -> Element(Nil) {
   html.html([], [
@@ -24,7 +25,7 @@ pub fn root_layout(
       html.link([rel("stylesheet"), href("/static/css/app.css")]),
     ]),
     html.body([class("bg-white")], [
-      app_layout(current_page, content),
+      app_layout(current_page, authenticated, content),
       html.script([src("/static/js/vendor/htmx.min.js")], ""),
       html.script([src("/static/js/vendor/sortable.min.js")], ""),
       html.script([src("/static/js/app.js")], ""),
@@ -32,7 +33,11 @@ pub fn root_layout(
   ])
 }
 
-fn app_layout(current_page: Page, content: List(Element(Nil))) -> Element(Nil) {
+fn app_layout(
+  current_page: Page,
+  authenticated: Bool,
+  content: List(Element(Nil)),
+) -> Element(Nil) {
   html.div([], [
     html.nav([class("grid grid-cols-2 p-4 sm:grid-cols-3 sm:px-6 lg:px-8")], [
       html.a([href("/")], [html.h1([class("inline")], [html.text("hotties")])]),
@@ -41,6 +46,21 @@ fn app_layout(current_page: Page, content: List(Element(Nil))) -> Element(Nil) {
         nav_link("/board", "Board", current_page == Board),
         nav_link("/archive", "Archive", current_page == Archive),
       ]),
+      case authenticated {
+        True ->
+          html.div([class("hidden sm:flex sm:justify-end")], [
+            html.form(
+              [attribute.method("post"), attribute.action("/auth/logout")],
+              [
+                html.button(
+                  [type_("submit"), class("text-sm text-neutral-400 underline")],
+                  [html.text("logout")],
+                ),
+              ],
+            ),
+          ])
+        False -> html.text("")
+      },
     ]),
     html.main([], content),
   ])
